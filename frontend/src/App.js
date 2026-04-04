@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import Layout from "@/components/Layout";
 import Dashboard from "@/pages/Dashboard";
 import VelnarTutor from "@/pages/VelnarTutor";
+import Translator from "@/pages/Translator";
 import DailyPlanner from "@/pages/DailyPlanner";
 import MealPlan from "@/pages/MealPlan";
 import WarriorPractices from "@/pages/WarriorPractices";
@@ -20,6 +21,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="velnar" element={<VelnarTutor />} />
+            <Route path="translator" element={<Translator />} />
             <Route path="planner" element={<DailyPlanner />} />
             <Route path="meals" element={<MealPlan />} />
             <Route path="warrior" element={<WarriorPractices />} />
