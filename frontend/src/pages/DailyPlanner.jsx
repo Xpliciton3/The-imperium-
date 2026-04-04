@@ -17,7 +17,10 @@ import {
   Target,
   ExternalLink,
   Filter,
-  X
+  X,
+  Droplets,
+  Flame,
+  Minus
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,8 +81,11 @@ export default function DailyPlanner() {
     linkedItem: ""
   });
   const [newCommitment, setNewCommitment] = useState("");
+  const [hydration, setHydration] = useState({ glasses: 0, goal: 8 });
+  const [streak, setStreak] = useState({ current_streak: 0, longest_streak: 0, total_days: 0 });
 
   const todayDate = new Date().toDateString();
+  const todayISO = new Date().toISOString().split('T')[0];
   const isToday = dailyProgress.date === todayDate;
 
   useEffect(() => {
@@ -87,7 +93,19 @@ export default function DailyPlanner() {
       .then(res => res.json())
       .then(data => setPractices(data))
       .catch(console.error);
-  }, []);
+    
+    // Fetch hydration for today
+    fetch(`${BACKEND_URL}/api/tracking/hydration/${todayISO}`)
+      .then(res => res.json())
+      .then(data => setHydration({ glasses: data.glasses || 0, goal: data.goal || 8 }))
+      .catch(console.error);
+    
+    // Fetch streak
+    fetch(`${BACKEND_URL}/api/tracking/streak`)
+      .then(res => res.json())
+      .then(setStreak)
+      .catch(console.error);
+  }, [todayISO]);
 
   // Reset progress for new day - only run once on mount
   useEffect(() => {
@@ -188,6 +206,7 @@ export default function DailyPlanner() {
       timestamp: new Date().toISOString(),
     };
     setActivityLog(prev => [newEntry, ...prev]);
+    logActivityToBackend(logData.type || "practice");
   };
 
   const handleAddLog = () => {
@@ -241,6 +260,31 @@ export default function DailyPlanner() {
   const filteredLogs = logFilter === "all" 
     ? activityLog 
     : activityLog.filter(log => log.type === logFilter);
+
+  const updateHydration = async (delta) => {
+    const newGlasses = Math.max(0, hydration.glasses + delta);
+    setHydration(prev => ({ ...prev, glasses: newGlasses }));
+    try {
+      await fetch(`${BACKEND_URL}/api/tracking/hydration`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ glasses: newGlasses, date: todayISO, goal: hydration.goal }),
+      });
+    } catch (e) { console.error(e); }
+  };
+
+  const logActivityToBackend = async (type) => {
+    try {
+      await fetch(`${BACKEND_URL}/api/tracking/activity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, date: todayISO }),
+      });
+      // Refresh streak
+      const res = await fetch(`${BACKEND_URL}/api/tracking/streak`);
+      setStreak(await res.json());
+    } catch (e) { console.error(e); }
+  };
 
   const morningProgress = isToday ? (dailyProgress.morning?.length || 0) : 0;
   const eveningProgress = isToday ? (dailyProgress.evening?.length || 0) : 0;
@@ -318,7 +362,7 @@ export default function DailyPlanner() {
       </div>
 
       {/* Progress Overview */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <Card className="bg-[#18181b] border-zinc-800">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -350,6 +394,53 @@ export default function DailyPlanner() {
               </div>
               {eveningProgress === 4 && <CheckCircle2 className="w-5 h-5 text-emerald-500" />}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Hydration Tracker */}
+        <Card className="bg-[#18181b] border-zinc-800" data-testid="hydration-tracker">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-sm bg-blue-500/10">
+                <Droplets className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500">Hydration</p>
+                <p className="text-lg font-bold text-zinc-100">{hydration.glasses}/{hydration.goal}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateHydration(-1)} data-testid="hydration-minus">
+                <Minus className="w-3 h-3" />
+              </Button>
+              <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all duration-300 rounded-full"
+                  style={{ width: `${Math.min(100, (hydration.glasses / hydration.goal) * 100)}%` }}
+                />
+              </div>
+              <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateHydration(1)} data-testid="hydration-plus">
+                <Plus className="w-3 h-3" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Streak */}
+        <Card className="bg-[#18181b] border-zinc-800" data-testid="streak-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-sm bg-orange-500/10">
+                  <Flame className="w-5 h-5 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500">Streak</p>
+                  <p className="text-lg font-bold text-zinc-100">{streak.current_streak} days</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-zinc-600 mt-1">Best: {streak.longest_streak} | Total: {streak.total_days}</p>
           </CardContent>
         </Card>
 

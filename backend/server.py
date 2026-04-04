@@ -5,14 +5,20 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field, ConfigDict
 import uuid
 from datetime import datetime, timezone
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Import modular data
+from data.ritual_preparations import RITUAL_PREPARATIONS
+from data.shadow_and_values import SHADOW_CHAPTERS, MORAL_ARCHITECTURE, COGNITIVE_FUNCTIONS
+from data.training_nutrition import TRAINING_REGIMEN, NUTRITIONAL_ARCHITECTURE
+from data.expanded_doctrines import EXPANDED_DOCTRINES, GLOSSARY, ADDITIONAL_MEDITATIONS
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -261,10 +267,13 @@ RITE_OF_THE_UNCROWNED = {
     "description": "The central initiation rite performed at entry and repeated at significant thresholds",
     "challenge_coin_url": "https://www.challengecoins4less.com",
     "preparation": {
-        "fasting": "24-hour fast before the rite",
+        "fasting": "REQUIRED: 24-hour fast before the rite (water only). The day before the rite, cease eating. The fast is broken at Stage 6.",
+        "fasting_detail": "Twenty-four hours of fasting (water only). This is non-negotiable. The fast creates the physiological and psychological state necessary for the rite to land with its full weight.",
         "timing": "Dawn or midnight",
-        "materials": ["Fire source (candle or small fire)", "Water", "The Codex (this doctrine)", "Pen", "Blade (symbolic)", "Solitude or trusted witness"],
-        "aromatics": ["Frankincense (threshold)", "Cedarwood (physical sealing)", "Sandalwood (inscription)"],
+        "duration": "Three to four hours minimum",
+        "materials": ["Fire source (candle, fireplace, or outdoor fire)", "Water (one glass)", "The Codex (physical copy of this doctrine)", "Paper and pen of personal weight", "Blade (bokken, iaito, significant knife, or chosen edge object)", "Solitude or one chosen witness"],
+        "aromatics": ["Frankincense (threshold — Stage 2)", "Cedarwood (physical sealing — Stage 4)", "Sandalwood (inscription — Stage 5)"],
+        "aromatic_sourcing": "See Ritual Preparations section for detailed sourcing of all oils and burning substances.",
     },
     "stages": [
         {
@@ -1046,15 +1055,26 @@ async def get_meditations():
 async def get_all_doctrines():
     return THE_DOCTRINES
 
+@api_router.get("/doctrines/litany/detailed")
+async def get_litany_detailed():
+    return THE_DOCTRINES["the_litany"]
+
+@api_router.get("/doctrines/expanded")
+async def get_expanded_doctrines():
+    return EXPANDED_DOCTRINES
+
+@api_router.get("/doctrines/expanded/{doctrine_key}")
+async def get_expanded_doctrine(doctrine_key: str):
+    key = f"the_{doctrine_key}" if not doctrine_key.startswith("the_") else doctrine_key
+    if key not in EXPANDED_DOCTRINES:
+        raise HTTPException(status_code=404, detail="Expanded doctrine not found")
+    return EXPANDED_DOCTRINES[key]
+
 @api_router.get("/doctrines/{doctrine_key}")
 async def get_doctrine(doctrine_key: str):
     if doctrine_key not in THE_DOCTRINES:
         raise HTTPException(status_code=404, detail="Doctrine not found")
     return THE_DOCTRINES[doctrine_key]
-
-@api_router.get("/doctrines/litany/detailed")
-async def get_litany_detailed():
-    return THE_DOCTRINES["the_litany"]
 
 # ============== PERMANENT RITE RECORD ==============
 class RiteCompletion(BaseModel):
@@ -1115,6 +1135,213 @@ async def complete_rite(completion: RiteCompletion):
     
     updated_record = await db.rite_records.find_one({"user": "default"}, {"_id": 0})
     return updated_record
+
+# ============== TRANSLATOR AI ENDPOINT ==============
+TRANSLATOR_SYSTEM_PROMPT = """You are the Imperium Communication Translator. You help translate messages between different MBTI communication styles.
+
+You understand that:
+- INTJ (The Uncrowned): Direct, minimal, assumes competence. Values efficiency over pleasantries. Strategic, independent. Speaks with purpose.
+- ESFJ (The Unspent): Warm, conscientious, harmonious. Checks in emotionally. Values connection and harmony. Inclusive, caring.
+- Other types have their own distinct styles.
+
+When translating:
+1. Preserve the INTENT and MEANING of the original message
+2. Adapt the TONE, STRUCTURE, and DELIVERY to match the target type
+3. For warm types (ESFJ, ENFP, ENFJ): Add softeners, empathy, emotional check-ins, warmth
+4. For direct types (INTJ, ISTP, INTP): Remove fluff, be concise, state the point clearly
+5. Never change the actual request or content — only the communication style
+6. Be natural, not robotic
+
+Respond ONLY with the translated message. No explanations or preambles."""
+
+class TranslatorRequest(BaseModel):
+    text: str
+    from_type: str
+    to_type: str
+    direction: str  # "outgoing" or "incoming"
+    session_id: Optional[str] = None
+
+class TranslatorResponse(BaseModel):
+    translated: str
+    session_id: str
+
+@api_router.post("/translator/translate", response_model=TranslatorResponse)
+async def translate_message(req: TranslatorRequest):
+    if not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=500, detail="LLM API key not configured")
+    
+    session_id = req.session_id or str(uuid.uuid4())
+    
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"translator-{session_id}",
+            system_message=TRANSLATOR_SYSTEM_PROMPT
+        ).with_model("gemini", "gemini-3-flash-preview")
+        
+        if req.direction == "outgoing":
+            prompt = f"I am {req.from_type}. Translate this message so a {req.to_type} will receive it best:\n\n{req.text}"
+        else:
+            prompt = f"A {req.from_type} sent me this message. I am {req.to_type}. Rewrite it in a way that makes the intent clear to my communication style:\n\n{req.text}"
+        
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        return TranslatorResponse(translated=response, session_id=session_id)
+    except Exception as e:
+        logger.error(f"Translator error: {e}")
+        if "budget" in str(e).lower() or "quota" in str(e).lower() or "limit" in str(e).lower():
+            raise HTTPException(status_code=429, detail="LLM budget limit reached. Please add balance at Profile > Universal Key > Add Balance.")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== TRACKING ENDPOINTS ==============
+class HydrationLog(BaseModel):
+    glasses: int
+    date: str
+    goal: Optional[int] = 8
+
+class WorkoutLog(BaseModel):
+    practice: str
+    exercises: List[Dict[str, Any]]
+    duration_minutes: int
+    date: str
+    notes: Optional[str] = None
+
+class StreakResponse(BaseModel):
+    current_streak: int
+    longest_streak: int
+    last_active: Optional[str] = None
+    total_days: int
+
+@api_router.post("/tracking/hydration")
+async def log_hydration(log: HydrationLog):
+    await db.hydration.update_one(
+        {"date": log.date},
+        {"$set": {"glasses": log.glasses, "goal": log.goal, "date": log.date}},
+        upsert=True
+    )
+    record = await db.hydration.find_one({"date": log.date}, {"_id": 0})
+    return record
+
+@api_router.get("/tracking/hydration/{date}")
+async def get_hydration(date: str):
+    record = await db.hydration.find_one({"date": date}, {"_id": 0})
+    return record or {"date": date, "glasses": 0, "goal": 8}
+
+@api_router.post("/tracking/workout")
+async def log_workout(log: WorkoutLog):
+    workout_data = {
+        "practice": log.practice,
+        "exercises": log.exercises,
+        "duration_minutes": log.duration_minutes,
+        "date": log.date,
+        "notes": log.notes,
+        "logged_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.workouts.insert_one(workout_data)
+    return {"status": "logged", "date": log.date}
+
+@api_router.get("/tracking/workouts/{date}")
+async def get_workouts(date: str):
+    workouts = await db.workouts.find({"date": date}, {"_id": 0}).to_list(100)
+    return {"workouts": workouts, "date": date}
+
+@api_router.get("/tracking/workouts")
+async def get_recent_workouts():
+    workouts = await db.workouts.find({}, {"_id": 0}).sort("logged_at", -1).to_list(30)
+    return {"workouts": workouts}
+
+@api_router.get("/tracking/streak")
+async def get_streak():
+    """Calculate streak from activity logs in MongoDB"""
+    activities = await db.activity_log.find({}, {"_id": 0}).sort("date", -1).to_list(1000)
+    
+    if not activities:
+        return {"current_streak": 0, "longest_streak": 0, "last_active": None, "total_days": 0}
+    
+    dates = sorted(set(a["date"] for a in activities if "date" in a), reverse=True)
+    total_days = len(dates)
+    
+    if not dates:
+        return {"current_streak": 0, "longest_streak": 0, "last_active": None, "total_days": 0}
+    
+    current_streak = 1
+    longest_streak = 1
+    streak = 1
+    
+    for i in range(len(dates) - 1):
+        try:
+            d1 = datetime.fromisoformat(dates[i])
+            d2 = datetime.fromisoformat(dates[i + 1])
+            if (d1 - d2).days == 1:
+                streak += 1
+                if i == 0 or (i > 0 and current_streak == streak - 1):
+                    current_streak = streak
+            else:
+                streak = 1
+            longest_streak = max(longest_streak, streak)
+        except (ValueError, TypeError):
+            streak = 1
+    
+    longest_streak = max(longest_streak, streak)
+    
+    return {
+        "current_streak": current_streak,
+        "longest_streak": longest_streak,
+        "last_active": dates[0] if dates else None,
+        "total_days": total_days
+    }
+
+@api_router.post("/tracking/activity")
+async def log_activity(activity: Dict[str, Any]):
+    activity_data = {
+        **activity,
+        "date": activity.get("date", datetime.now(timezone.utc).strftime("%Y-%m-%d")),
+        "logged_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.activity_log.insert_one(activity_data)
+    return {"status": "logged"}
+
+# ============== NEW CONTENT ENDPOINTS ==============
+
+@api_router.get("/shadow")
+async def get_shadow_chapters():
+    return {"chapters": SHADOW_CHAPTERS}
+
+@api_router.get("/shadow/{chapter_id}")
+async def get_shadow_chapter(chapter_id: str):
+    chapter = next((c for c in SHADOW_CHAPTERS if c["id"] == chapter_id), None)
+    if not chapter:
+        raise HTTPException(status_code=404, detail="Shadow chapter not found")
+    return chapter
+
+@api_router.get("/moral-architecture")
+async def get_moral_architecture():
+    return MORAL_ARCHITECTURE
+
+@api_router.get("/cognitive-functions")
+async def get_cognitive_functions():
+    return {"functions": COGNITIVE_FUNCTIONS}
+
+@api_router.get("/ritual-preparations")
+async def get_ritual_preparations():
+    return RITUAL_PREPARATIONS
+
+@api_router.get("/training-regimen")
+async def get_training_regimen():
+    return TRAINING_REGIMEN
+
+@api_router.get("/nutritional-architecture")
+async def get_nutritional_architecture():
+    return NUTRITIONAL_ARCHITECTURE
+
+@api_router.get("/glossary")
+async def get_glossary():
+    return GLOSSARY
+
+@api_router.get("/practices/meditations/all")
+async def get_all_meditations():
+    return {"meditations": MEDITATIONS + ADDITIONAL_MEDITATIONS}
 
 # Include router and add middleware
 app.include_router(api_router)

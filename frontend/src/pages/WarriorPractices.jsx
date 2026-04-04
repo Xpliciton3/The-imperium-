@@ -9,7 +9,11 @@ import {
   Circle,
   Clock,
   AlertCircle,
-  BookOpen
+  BookOpen,
+  Plus,
+  Save,
+  Dumbbell,
+  X
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +22,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { cn } from "@/lib/utils";
 
@@ -39,11 +45,21 @@ export default function WarriorPractices() {
     throwing_daggers: { stage: 1, progress: 0, completedRequirements: [] }
   });
   const [selectedPractice, setSelectedPractice] = useState("iaido");
+  const [showWorkoutLog, setShowWorkoutLog] = useState(false);
+  const [workoutExercises, setWorkoutExercises] = useState([{ name: "", sets: "", reps: "", duration: "" }]);
+  const [workoutDuration, setWorkoutDuration] = useState("");
+  const [workoutNotes, setWorkoutNotes] = useState("");
+  const [recentWorkouts, setRecentWorkouts] = useState([]);
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/warrior/practices`)
       .then(r => r.json())
       .then(data => setPractices(data))
+      .catch(console.error);
+    
+    fetch(`${BACKEND_URL}/api/tracking/workouts`)
+      .then(r => r.json())
+      .then(data => setRecentWorkouts(data.workouts || []))
       .catch(console.error);
   }, []);
 
@@ -116,6 +132,56 @@ export default function WarriorPractices() {
 
   const isTestPassed = (testNum) => {
     return (warriorProgress.systema?.passedTests || []).includes(testNum);
+  };
+
+  const addExerciseRow = () => {
+    setWorkoutExercises(prev => [...prev, { name: "", sets: "", reps: "", duration: "" }]);
+  };
+
+  const updateExercise = (idx, field, value) => {
+    setWorkoutExercises(prev => prev.map((ex, i) => i === idx ? { ...ex, [field]: value } : ex));
+  };
+
+  const removeExercise = (idx) => {
+    setWorkoutExercises(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const submitWorkout = async () => {
+    const validExercises = workoutExercises.filter(e => e.name.trim());
+    if (validExercises.length === 0) return;
+
+    try {
+      await fetch(`${BACKEND_URL}/api/tracking/workout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          practice: selectedPractice,
+          exercises: validExercises,
+          duration_minutes: parseInt(workoutDuration) || 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: workoutNotes,
+        }),
+      });
+      
+      // Log as activity for streak
+      await fetch(`${BACKEND_URL}/api/tracking/activity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "workout", date: new Date().toISOString().split('T')[0] }),
+      });
+
+      // Refresh workouts
+      const res = await fetch(`${BACKEND_URL}/api/tracking/workouts`);
+      const data = await res.json();
+      setRecentWorkouts(data.workouts || []);
+      
+      setShowWorkoutLog(false);
+      setWorkoutExercises([{ name: "", sets: "", reps: "", duration: "" }]);
+      setWorkoutDuration("");
+      setWorkoutNotes("");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const overallProgress = ((currentProgress.stage - 1) / totalStages) * 100 + (currentProgress.progress / totalStages);
@@ -414,6 +480,128 @@ export default function WarriorPractices() {
           </div>
         </div>
       )}
+
+      {/* Workout Logging Section */}
+      <Card className="bg-[#18181b] border-zinc-800" data-testid="workout-logger">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="heading-4 flex items-center gap-2">
+              <Dumbbell className="w-5 h-5 text-blue-400" />
+              Workout Log
+            </CardTitle>
+            <Dialog open={showWorkoutLog} onOpenChange={setShowWorkoutLog}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="bg-red-600 hover:bg-red-700" data-testid="log-workout-btn">
+                  <Plus className="w-4 h-4 mr-1" /> Log Workout
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-[#18181b] border-zinc-800 max-w-lg max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="heading-4 text-zinc-100">Log Workout</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div>
+                    <label className="text-xs text-zinc-500 mb-1 block">Total Duration (minutes)</label>
+                    <Input 
+                      type="number"
+                      value={workoutDuration}
+                      onChange={e => setWorkoutDuration(e.target.value)}
+                      placeholder="e.g. 60"
+                      className="bg-zinc-900 border-zinc-800"
+                      data-testid="workout-duration"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-xs text-zinc-500 mb-2 block">Exercises</label>
+                    {workoutExercises.map((ex, i) => (
+                      <div key={i} className="grid grid-cols-[1fr_60px_60px_60px_30px] gap-2 mb-2 items-center">
+                        <Input
+                          value={ex.name}
+                          onChange={e => updateExercise(i, "name", e.target.value)}
+                          placeholder="Exercise name"
+                          className="bg-zinc-900 border-zinc-800 text-sm"
+                        />
+                        <Input
+                          value={ex.sets}
+                          onChange={e => updateExercise(i, "sets", e.target.value)}
+                          placeholder="Sets"
+                          className="bg-zinc-900 border-zinc-800 text-sm"
+                        />
+                        <Input
+                          value={ex.reps}
+                          onChange={e => updateExercise(i, "reps", e.target.value)}
+                          placeholder="Reps"
+                          className="bg-zinc-900 border-zinc-800 text-sm"
+                        />
+                        <Input
+                          value={ex.duration}
+                          onChange={e => updateExercise(i, "duration", e.target.value)}
+                          placeholder="Min"
+                          className="bg-zinc-900 border-zinc-800 text-sm"
+                        />
+                        {workoutExercises.length > 1 && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeExercise(i)}>
+                            <X className="w-3 h-3 text-zinc-500" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button variant="outline" size="sm" onClick={addExerciseRow} className="mt-1" data-testid="add-exercise">
+                      <Plus className="w-3 h-3 mr-1" /> Add Exercise
+                    </Button>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-zinc-500 mb-1 block">Notes</label>
+                    <Textarea
+                      value={workoutNotes}
+                      onChange={e => setWorkoutNotes(e.target.value)}
+                      placeholder="Session notes..."
+                      className="bg-zinc-900 border-zinc-800 min-h-[80px]"
+                    />
+                  </div>
+
+                  <Button onClick={submitWorkout} className="w-full bg-red-600 hover:bg-red-700" data-testid="save-workout">
+                    <Save className="w-4 h-4 mr-2" /> Save Workout
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {recentWorkouts.length === 0 ? (
+            <p className="text-sm text-zinc-500">No workouts logged yet. Start tracking your training.</p>
+          ) : (
+            <div className="space-y-3">
+              {recentWorkouts.slice(0, 10).map((w, i) => (
+                <div key={i} className="p-3 bg-zinc-900/50 rounded-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-medium text-zinc-200 capitalize">{w.practice?.replace("_", " ") || "Workout"}</p>
+                    <div className="flex items-center gap-2">
+                      {w.duration_minutes > 0 && (
+                        <Badge variant="outline" className="text-xs">
+                          <Clock className="w-3 h-3 mr-1" />{w.duration_minutes} min
+                        </Badge>
+                      )}
+                      <span className="text-xs text-zinc-600">{w.date}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {w.exercises?.map((ex, j) => (
+                      <Badge key={j} variant="outline" className="text-xs">
+                        {ex.name}{ex.sets && `: ${ex.sets}x${ex.reps}`}{ex.duration && ` ${ex.duration}min`}
+                      </Badge>
+                    ))}
+                  </div>
+                  {w.notes && <p className="text-xs text-zinc-500 mt-1">{w.notes}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

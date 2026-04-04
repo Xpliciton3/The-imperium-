@@ -300,28 +300,44 @@ export default function RiteOfUncrowned() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="p-4 bg-zinc-900/50 rounded-sm">
                     <p className="text-sm font-medium text-zinc-200 mb-2">Required Preparation</p>
+                    <div className="p-3 bg-red-600/10 border border-red-600/30 rounded-sm mb-3">
+                      <p className="text-sm font-bold text-red-400">24-HOUR FAST REQUIRED</p>
+                      <p className="text-xs text-zinc-300 mt-1">
+                        {riteData?.preparation?.fasting_detail || "Twenty-four hours of fasting (water only). This is non-negotiable. The fast creates the physiological and psychological state necessary for the rite to land with its full weight."}
+                      </p>
+                    </div>
                     <ul className="space-y-1 text-xs text-zinc-400">
-                      <li>• 24-hour fast before the rite</li>
-                      <li>• Perform at dawn or midnight</li>
-                      <li>• Ensure complete solitude (or one trusted witness)</li>
-                      <li>• Have all materials ready before starting</li>
+                      <li>Perform at {riteData?.preparation?.timing || "dawn or midnight"}</li>
+                      <li>Ensure complete solitude (or one trusted witness)</li>
+                      <li>Have all materials ready before starting</li>
+                      <li>Duration: {riteData?.preparation?.duration || "Three to four hours minimum"}</li>
                     </ul>
                   </div>
                   <div className="p-4 bg-zinc-900/50 rounded-sm">
                     <p className="text-sm font-medium text-zinc-200 mb-2">Materials Needed</p>
                     <ul className="space-y-1 text-xs text-zinc-400">
                       {riteData?.preparation?.materials?.map((mat, idx) => (
-                        <li key={idx}>• {mat}</li>
+                        <li key={idx}>{mat}</li>
                       ))}
                     </ul>
                   </div>
                 </div>
 
-                <div className="p-4 bg-zinc-900/50 rounded-sm">
-                  <p className="text-sm font-medium text-zinc-200 mb-2">Optional Aromatics</p>
-                  <p className="text-xs text-zinc-400">
-                    {riteData?.preparation?.aromatics?.join(" • ")}
-                  </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-zinc-900/50 rounded-sm">
+                    <p className="text-sm font-medium text-zinc-200 mb-2">Aromatics</p>
+                    <ul className="space-y-1 text-xs text-zinc-400">
+                      {riteData?.preparation?.aromatics?.map((a, i) => (
+                        <li key={i}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  {riteData?.preparation?.aromatic_sourcing && (
+                    <div className="p-4 bg-amber-600/5 border border-amber-600/20 rounded-sm">
+                      <p className="text-sm font-medium text-amber-400 mb-1">Sourcing</p>
+                      <p className="text-xs text-zinc-300">{riteData.preparation.aromatic_sourcing}</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

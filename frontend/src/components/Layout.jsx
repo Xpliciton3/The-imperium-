@@ -11,7 +11,12 @@ import {
   Menu,
   X,
   ScrollText,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Eye,
+  Dumbbell,
+  Apple,
+  Flame,
+  BookOpenCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DoctrinesPanel from "@/components/DoctrinesPanel";
@@ -20,14 +25,19 @@ const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/art
 
 const navItems = [
   { path: "/", icon: null, label: "Dashboard", exact: true, useLogo: true },
-  { path: "/velnar", icon: BookOpen, label: "Vel'nar Tutor" },
+  { path: "/tutor", icon: BookOpen, label: "Vel'nar Tutor" },
   { path: "/translator", icon: ArrowRightLeft, label: "Translator" },
   { path: "/planner", icon: Calendar, label: "Daily Walkthrough" },
+  { path: "/shadow", icon: Eye, label: "Shadow Work" },
+  { path: "/training", icon: Dumbbell, label: "Training Regimen" },
+  { path: "/nutrition", icon: Apple, label: "Nutrition" },
   { path: "/meals", icon: Utensils, label: "Meal Plan" },
   { path: "/warrior", icon: Sword, label: "Warrior Practices" },
   { path: "/rite", icon: Crown, label: "Rite of the Uncrowned" },
   { path: "/meditations", icon: Moon, label: "Meditations" },
+  { path: "/preparations", icon: Flame, label: "Ritual Preparations" },
   { path: "/calendar", icon: CalendarDays, label: "Calendar" },
+  { path: "/glossary", icon: BookOpenCheck, label: "Glossary" },
 ];
 
 export default function Layout() {
