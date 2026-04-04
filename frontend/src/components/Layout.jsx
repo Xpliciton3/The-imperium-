@@ -16,7 +16,8 @@ import {
   Dumbbell,
   Apple,
   Flame,
-  BookOpenCheck
+  BookOpenCheck,
+  Languages
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DoctrinesPanel from "@/components/DoctrinesPanel";
@@ -26,6 +27,7 @@ const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/art
 const navItems = [
   { path: "/", icon: null, label: "Dashboard", exact: true, useLogo: true },
   { path: "/tutor", icon: BookOpen, label: "Vel'nar Tutor" },
+  { path: "/velnar-guide", icon: Languages, label: "Vel'nar Language" },
   { path: "/translator", icon: ArrowRightLeft, label: "Translator" },
   { path: "/planner", icon: Calendar, label: "Daily Walkthrough" },
   { path: "/shadow", icon: Eye, label: "Shadow Work" },

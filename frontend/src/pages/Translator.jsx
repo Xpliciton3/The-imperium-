@@ -1,48 +1,65 @@
-import React, { useState, useCallback } from "react";
-import { ArrowRightLeft, Copy, Check, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { ArrowRightLeft, Send, Copy, Check, Loader2, Settings, X, ArrowRight, ArrowLeft, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 const MBTI_TYPES = [
-  { value: "INTJ", label: "INTJ", alias: "The Uncrowned", description: "Direct, strategic, minimal. Values efficiency." },
-  { value: "ESFJ", label: "ESFJ", alias: "The Unspent", description: "Warm, harmonious, conscientious. Values connection." },
-  { value: "INTP", label: "INTP", alias: "The Theorist", description: "Analytical, precise, abstract." },
-  { value: "ENFP", label: "ENFP", alias: "The Catalyst", description: "Enthusiastic, expressive, possibility-driven." },
-  { value: "INFJ", label: "INFJ", alias: "The Counselor", description: "Empathic, insightful, purposeful." },
-  { value: "ESTP", label: "ESTP", alias: "The Operative", description: "Action-first, direct, pragmatic." },
-  { value: "ENFJ", label: "ENFJ", alias: "The Mentor", description: "Warm, persuasive, orchestrating." },
-  { value: "ISTP", label: "ISTP", alias: "The Craftsman", description: "Efficient, logical, independent." },
+  { value: "INTJ", alias: "The Uncrowned", desc: "Direct, strategic, minimal" },
+  { value: "ESFJ", alias: "The Unspent", desc: "Warm, harmonious, conscientious" },
+  { value: "INTP", alias: "The Theorist", desc: "Analytical, precise, abstract" },
+  { value: "ENFP", alias: "The Catalyst", desc: "Enthusiastic, expressive" },
+  { value: "INFJ", alias: "The Counselor", desc: "Empathic, insightful" },
+  { value: "ESTP", alias: "The Operative", desc: "Action-first, pragmatic" },
+  { value: "ENFJ", alias: "The Mentor", desc: "Warm, persuasive" },
+  { value: "ISTP", alias: "The Craftsman", desc: "Efficient, independent" },
 ];
 
 export default function Translator() {
-  const [inputText, setInputText] = useState("");
-  const [outputText, setOutputText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [fromType, setFromType] = useState("INTJ");
   const [toType, setToType] = useState("ESFJ");
   const [direction, setDirection] = useState("outgoing");
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [error, setError] = useState("");
+  const [copiedId, setCopiedId] = useState(null);
   const [sessionId, setSessionId] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
 
-  const translate = useCallback(async () => {
-    if (!inputText.trim()) return;
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
+
+  const sendMessage = useCallback(async () => {
+    if (!input.trim() || loading) return;
+    const text = input.trim();
+    setInput("");
+    
+    const userMsg = {
+      id: Date.now(),
+      type: "user",
+      text,
+      direction,
+      from: direction === "outgoing" ? fromType : toType,
+      to: direction === "outgoing" ? toType : fromType,
+    };
+    setMessages(prev => [...prev, userMsg]);
     setLoading(true);
-    setError("");
-    setOutputText("");
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/translator/translate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: inputText,
+          text,
           from_type: direction === "outgoing" ? fromType : toType,
           to_type: direction === "outgoing" ? toType : fromType,
           direction,
@@ -56,201 +73,224 @@ export default function Translator() {
       }
 
       const data = await res.json();
-      setOutputText(data.translated);
       setSessionId(data.session_id);
+      
+      const aiMsg = {
+        id: Date.now() + 1,
+        type: "ai",
+        text: data.translated,
+        direction,
+        from: direction === "outgoing" ? fromType : toType,
+        to: direction === "outgoing" ? toType : fromType,
+      };
+      setMessages(prev => [...prev, aiMsg]);
     } catch (e) {
-      setError(e.message);
+      const errMsg = {
+        id: Date.now() + 1,
+        type: "error",
+        text: e.message,
+      };
+      setMessages(prev => [...prev, errMsg]);
     } finally {
       setLoading(false);
+      inputRef.current?.focus();
     }
-  }, [inputText, fromType, toType, direction, sessionId]);
+  }, [input, fromType, toType, direction, sessionId, loading]);
 
-  const copyOutput = () => {
-    navigator.clipboard.writeText(outputText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyText = (id, text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const swapTypes = () => {
-    setFromType(toType);
-    setToType(fromType);
+  const clearChat = () => {
+    setMessages([]);
+    setSessionId(null);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   const fromInfo = MBTI_TYPES.find(t => t.value === fromType);
   const toInfo = MBTI_TYPES.find(t => t.value === toType);
 
   return (
-    <div className="p-6 lg:p-8 space-y-6" data-testid="translator-page">
-      <div>
-        <h1 className="heading-2 text-zinc-100">Communication Translator</h1>
-        <p className="body-text mt-2">
-          Translate between cognitive communication styles. Paste a message, select the types, and receive an adapted version.
-        </p>
-      </div>
-
-      {/* Direction Toggle */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant={direction === "outgoing" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setDirection("outgoing")}
-          className={cn(direction === "outgoing" && "bg-red-600 hover:bg-red-700")}
-          data-testid="direction-outgoing"
-        >
-          <ArrowRight className="w-4 h-4 mr-1" />
-          Sending (Outgoing)
-        </Button>
-        <Button
-          variant={direction === "incoming" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setDirection("incoming")}
-          className={cn(direction === "incoming" && "bg-blue-600 hover:bg-blue-700")}
-          data-testid="direction-incoming"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Receiving (Incoming)
-        </Button>
-      </div>
-
-      {/* Type Selectors */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="flex-1 min-w-[200px]">
-          <p className="text-xs text-zinc-500 mb-2">
-            {direction === "outgoing" ? "You Are" : "They Are"}
-          </p>
-          <Select value={fromType} onValueChange={setFromType}>
-            <SelectTrigger className="bg-zinc-900 border-zinc-800" data-testid="from-type-select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
-              {MBTI_TYPES.map(t => (
-                <SelectItem key={t.value} value={t.value}>
-                  <span className="font-mono text-red-400">{t.value}</span>
-                  <span className="text-zinc-500 ml-2">{t.alias}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {fromInfo && (
-            <p className="text-xs text-zinc-500 mt-1">{fromInfo.description}</p>
-          )}
+    <div className="p-6 lg:p-8 flex flex-col h-[calc(100vh-4rem)]" data-testid="translator-page">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="heading-2 text-zinc-100">Communication Translator</h1>
+          <p className="text-xs text-zinc-500">Live chat. Paste their message or type yours. Get the MBTI-adapted version.</p>
         </div>
-
-        <Button variant="ghost" size="icon" onClick={swapTypes} className="mt-4" data-testid="swap-types">
-          <ArrowRightLeft className="w-5 h-5 text-zinc-500" />
-        </Button>
-
-        <div className="flex-1 min-w-[200px]">
-          <p className="text-xs text-zinc-500 mb-2">
-            {direction === "outgoing" ? "They Are" : "You Are"}
-          </p>
-          <Select value={toType} onValueChange={setToType}>
-            <SelectTrigger className="bg-zinc-900 border-zinc-800" data-testid="to-type-select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-zinc-800">
-              {MBTI_TYPES.map(t => (
-                <SelectItem key={t.value} value={t.value}>
-                  <span className="font-mono text-red-400">{t.value}</span>
-                  <span className="text-zinc-500 ml-2">{t.alias}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {toInfo && (
-            <p className="text-xs text-zinc-500 mt-1">{toInfo.description}</p>
-          )}
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)} data-testid="settings-btn">
+            <Settings className="w-4 h-4 text-zinc-400" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={clearChat} data-testid="clear-chat">
+            <Trash2 className="w-4 h-4 text-zinc-400" />
+          </Button>
         </div>
       </div>
 
-      {/* Translation Area */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        <Card className="bg-[#18181b] border-zinc-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm text-zinc-400">
-              {direction === "outgoing" ? "Your Message" : "Their Message"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={inputText}
-              onChange={e => setInputText(e.target.value)}
-              placeholder={direction === "outgoing" ? "Type or paste what you want to say..." : "Paste what they sent you..."}
-              className="min-h-[200px] bg-zinc-900 border-zinc-800 resize-none"
-              data-testid="translator-input"
-            />
-            <Button 
-              onClick={translate}
-              disabled={loading || !inputText.trim()}
-              className="mt-3 w-full bg-red-600 hover:bg-red-700"
-              data-testid="translate-btn"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Translating...
-                </>
-              ) : (
-                <>
-                  <ArrowRightLeft className="w-4 h-4 mr-2" />
-                  Translate
-                </>
-              )}
+      {/* Settings Panel */}
+      {showSettings && (
+        <Card className="bg-[#18181b] border-zinc-800 mb-4" data-testid="settings-panel">
+          <CardContent className="p-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <Button
+                variant={direction === "outgoing" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDirection("outgoing")}
+                className={cn(direction === "outgoing" && "bg-red-600 hover:bg-red-700")}
+                data-testid="direction-outgoing"
+              >
+                <ArrowRight className="w-3 h-3 mr-1" />
+                I'm Sending
+              </Button>
+              <Button
+                variant={direction === "incoming" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDirection("incoming")}
+                className={cn(direction === "incoming" && "bg-blue-600 hover:bg-blue-700")}
+                data-testid="direction-incoming"
+              >
+                <ArrowLeft className="w-3 h-3 mr-1" />
+                I Received
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">{direction === "outgoing" ? "I Am" : "They Are"}</p>
+                <Select value={fromType} onValueChange={setFromType}>
+                  <SelectTrigger className="bg-zinc-900 border-zinc-800 text-sm" data-testid="from-type-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-zinc-800">
+                    {MBTI_TYPES.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        <span className="font-mono text-red-400">{t.value}</span>
+                        <span className="text-zinc-500 ml-1">{t.alias}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500 mb-1">{direction === "outgoing" ? "They Are" : "I Am"}</p>
+                <Select value={toType} onValueChange={setToType}>
+                  <SelectTrigger className="bg-zinc-900 border-zinc-800 text-sm" data-testid="to-type-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-zinc-900 border-zinc-800">
+                    {MBTI_TYPES.map(t => (
+                      <SelectItem key={t.value} value={t.value}>
+                        <span className="font-mono text-red-400">{t.value}</span>
+                        <span className="text-zinc-500 ml-1">{t.alias}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setShowSettings(false)} className="text-xs text-zinc-500">
+              <X className="w-3 h-3 mr-1" /> Close Settings
             </Button>
           </CardContent>
         </Card>
+      )}
 
-        <Card className="bg-[#18181b] border-zinc-800">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm text-zinc-400">
-                {direction === "outgoing" ? "Adapted for Them" : "What They Actually Mean"}
-              </CardTitle>
-              {outputText && (
-                <Button variant="ghost" size="sm" onClick={copyOutput} data-testid="copy-output">
-                  {copied ? (
-                    <Check className="w-4 h-4 text-emerald-400" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-zinc-500" />
-                  )}
+      {/* Current Config Bar */}
+      <div className="flex items-center gap-2 mb-3 text-xs text-zinc-500 flex-wrap">
+        <Badge variant="outline" className="font-mono text-red-400">{fromType}</Badge>
+        <span>{direction === "outgoing" ? "sending to" : "received from"}</span>
+        <Badge variant="outline" className="font-mono text-blue-400">{toType}</Badge>
+        {fromInfo && <span className="text-zinc-600">({fromInfo.alias} {direction === "outgoing" ? "→" : "←"} {toInfo?.alias})</span>}
+      </div>
+
+      {/* Chat Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-2 mb-4 min-h-0">
+        {messages.length === 0 && (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center space-y-2">
+              <ArrowRightLeft className="w-8 h-8 text-zinc-700 mx-auto" />
+              <p className="text-sm text-zinc-500">Start a conversation.</p>
+              <p className="text-xs text-zinc-600">
+                {direction === "outgoing" 
+                  ? "Type what you want to say and get it translated for them."
+                  : "Paste what they sent you and see what they actually mean."}
+              </p>
+            </div>
+          </div>
+        )}
+        {messages.map(msg => (
+          <div key={msg.id} className={cn("flex", msg.type === "user" ? "justify-end" : "justify-start")}>
+            <div className={cn(
+              "max-w-[80%] rounded-sm p-3",
+              msg.type === "user" && "bg-red-600/10 border border-red-600/20",
+              msg.type === "ai" && "bg-zinc-800/50 border border-zinc-700/50",
+              msg.type === "error" && "bg-red-900/20 border border-red-800/30"
+            )}>
+              {msg.type === "user" && (
+                <p className="text-xs text-red-400 mb-1 font-mono">
+                  {msg.direction === "outgoing" ? "Your message" : "Their message"}
+                </p>
+              )}
+              {msg.type === "ai" && (
+                <p className="text-xs text-emerald-400 mb-1 font-mono">
+                  {msg.direction === "outgoing" ? `Adapted for ${msg.to}` : `What they meant (${msg.from})`}
+                </p>
+              )}
+              {msg.type === "error" && (
+                <p className="text-xs text-red-400 mb-1">Error</p>
+              )}
+              <p className="text-sm text-zinc-200 whitespace-pre-wrap" data-testid={`msg-${msg.id}`}>{msg.text}</p>
+              {msg.type === "ai" && (
+                <Button 
+                  variant="ghost" size="sm" 
+                  className="mt-2 h-6 text-xs text-zinc-500"
+                  onClick={() => copyText(msg.id, msg.text)}
+                  data-testid={`copy-${msg.id}`}
+                >
+                  {copiedId === msg.id ? <Check className="w-3 h-3 mr-1 text-emerald-400" /> : <Copy className="w-3 h-3 mr-1" />}
+                  {copiedId === msg.id ? "Copied" : "Copy"}
                 </Button>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="min-h-[200px] p-4 bg-zinc-900 border border-zinc-800 rounded-sm">
-              {loading ? (
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Processing...</span>
-                </div>
-              ) : outputText ? (
-                <p className="text-sm text-zinc-200 whitespace-pre-wrap" data-testid="translator-output">{outputText}</p>
-              ) : (
-                <p className="text-sm text-zinc-600">Translated message will appear here...</p>
-              )}
+          </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-sm p-3">
+              <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
             </div>
-            {error && (
-              <p className="text-xs text-red-400 mt-2" data-testid="translator-error">{error}</p>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
 
-      {/* Quick Reference */}
-      <Card className="bg-zinc-900/30 border-zinc-800">
-        <CardContent className="p-4">
-          <p className="text-xs text-zinc-500 mb-2">Quick Reference</p>
-          <div className="flex flex-wrap gap-2">
-            {MBTI_TYPES.slice(0, 4).map(t => (
-              <Badge key={t.value} variant="outline" className="text-xs">
-                <span className="font-mono text-red-400 mr-1">{t.value}</span>
-                <span className="text-zinc-500">{t.alias}</span>
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Input Area */}
+      <div className="flex gap-2 items-end">
+        <Textarea
+          ref={inputRef}
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={direction === "outgoing" ? "Type what you want to say..." : "Paste what they sent you..."}
+          className="bg-zinc-900 border-zinc-800 resize-none min-h-[56px] max-h-[120px]"
+          data-testid="translator-input"
+        />
+        <Button
+          onClick={sendMessage}
+          disabled={loading || !input.trim()}
+          className="bg-red-600 hover:bg-red-700 h-[56px] px-4"
+          data-testid="send-btn"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        </Button>
+      </div>
     </div>
   );
 }

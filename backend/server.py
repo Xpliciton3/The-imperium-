@@ -19,6 +19,8 @@ from data.ritual_preparations import RITUAL_PREPARATIONS
 from data.shadow_and_values import SHADOW_CHAPTERS, MORAL_ARCHITECTURE, COGNITIVE_FUNCTIONS
 from data.training_nutrition import TRAINING_REGIMEN, NUTRITIONAL_ARCHITECTURE
 from data.expanded_doctrines import EXPANDED_DOCTRINES, GLOSSARY, ADDITIONAL_MEDITATIONS
+from data.meal_plan_full import MEAL_PLAN_META, RECIPES as FULL_RECIPES, DAYS_30
+from data.velnar_language import VELNAR_LANGUAGE_GUIDE
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -997,17 +999,37 @@ async def velnar_chat(chat_message: ChatMessage):
 # Meal Plan Endpoints
 @api_router.get("/meals/plan")
 async def get_meal_plan():
-    return {"days": MEAL_PLAN_30_DAYS}
+    return {
+        "meta": MEAL_PLAN_META,
+        "recipes": FULL_RECIPES,
+        "days": DAYS_30,
+    }
 
 @api_router.get("/meals/plan/{day}")
 async def get_meal_plan_day(day: int):
-    if day < 1 or day > 30:
-        raise HTTPException(status_code=404, detail="Day must be between 1 and 30")
-    return MEAL_PLAN_30_DAYS[day - 1]
+    if day < 1 or day > len(DAYS_30):
+        raise HTTPException(status_code=404, detail="Day not found")
+    day_data = DAYS_30[day - 1]
+    resolved = {**day_data}
+    for meal_key in ["breakfast", "lunch", "dinner"]:
+        recipe_key = day_data.get(meal_key, "")
+        if recipe_key == "leftover":
+            resolved[meal_key] = {"name": "Leftover from last night's dinner", "cost": "$0.00", "is_leftover": True}
+        elif recipe_key in FULL_RECIPES:
+            resolved[meal_key] = FULL_RECIPES[recipe_key]
+        else:
+            resolved[meal_key] = {"name": recipe_key}
+    return resolved
+
+@api_router.get("/meals/recipe/{recipe_key}")
+async def get_recipe(recipe_key: str):
+    if recipe_key not in FULL_RECIPES:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    return FULL_RECIPES[recipe_key]
 
 @api_router.get("/meals/recipes")
 async def get_recipes():
-    return {"recipes": RECIPES}
+    return {"recipes": FULL_RECIPES}
 
 @api_router.get("/meals/recipes/{recipe_name}")
 async def get_recipe(recipe_name: str):
@@ -1342,6 +1364,10 @@ async def get_glossary():
 @api_router.get("/practices/meditations/all")
 async def get_all_meditations():
     return {"meditations": MEDITATIONS + ADDITIONAL_MEDITATIONS}
+
+@api_router.get("/velnar/language-guide")
+async def get_velnar_language_guide():
+    return VELNAR_LANGUAGE_GUIDE
 
 # Include router and add middleware
 app.include_router(api_router)

@@ -15,6 +15,7 @@ import TrainingRegimen from "./pages/TrainingRegimen";
 import NutritionalArchitecture from "./pages/NutritionalArchitecture";
 import RitualPreparations from "./pages/RitualPreparations";
 import GlossaryPage from "./pages/GlossaryPage";
+import VelnarLanguageGuide from "./pages/VelnarLanguageGuide";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/nutrition" element={<NutritionalArchitecture />} />
           <Route path="/preparations" element={<RitualPreparations />} />
           <Route path="/glossary" element={<GlossaryPage />} />
+          <Route path="/velnar-guide" element={<VelnarLanguageGuide />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -147,15 +147,21 @@ export default function Dashboard() {
               <>
                 <div className="p-3 bg-zinc-900/50 rounded-sm">
                   <p className="overline mb-1">Breakfast</p>
-                  <p className="text-sm text-zinc-200">{mealPlan.breakfast}</p>
+                  <p className="text-sm text-zinc-200">
+                    {typeof mealPlan.breakfast === 'object' ? mealPlan.breakfast?.name : mealPlan.breakfast}
+                  </p>
                 </div>
                 <div className="p-3 bg-zinc-900/50 rounded-sm">
                   <p className="overline mb-1">Lunch</p>
-                  <p className="text-sm text-zinc-200">{mealPlan.lunch}</p>
+                  <p className="text-sm text-zinc-200">
+                    {typeof mealPlan.lunch === 'object' ? mealPlan.lunch?.name : (mealPlan.lunch === 'leftover' ? 'Leftover from dinner' : mealPlan.lunch)}
+                  </p>
                 </div>
                 <div className="p-3 bg-zinc-900/50 rounded-sm">
                   <p className="overline mb-1">Dinner</p>
-                  <p className="text-sm text-zinc-200">{mealPlan.dinner}</p>
+                  <p className="text-sm text-zinc-200">
+                    {typeof mealPlan.dinner === 'object' ? mealPlan.dinner?.name : mealPlan.dinner}
+                  </p>
                 </div>
               </>
             ) : (
