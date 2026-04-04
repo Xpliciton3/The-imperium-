@@ -1,0 +1,102 @@
+{
+  "project_name": "The Imperium",
+  "theme": "Dark",
+  "archetype": "2_and_5_hybrid",
+  "mood": "Contemplative, Sovereign, Forge, Shadow, Ancient-yet-modern",
+  "typography": {
+    "font_family": {
+      "headings": "'Cormorant Garamond', serif",
+      "body": "'Manrope', sans-serif",
+      "mono": "'JetBrains Mono', monospace"
+    },
+    "scale_rules": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none font-medium",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-snug",
+      "h3": "text-xl sm:text-2xl tracking-normal",
+      "h4": "text-lg sm:text-xl font-medium",
+      "body": "text-base leading-relaxed text-zinc-300",
+      "small": "text-sm text-zinc-400",
+      "overline": "uppercase text-xs tracking-[0.2em] font-bold text-zinc-500"
+    }
+  },
+  "colors": {
+    "background": "#09090b",
+    "surface": "#18181b",
+    "surface_elevated": "#27272a",
+    "primary": "#dc2626",
+    "primary_hover": "#ef4444",
+    "secondary": "#d97706",
+    "border": "#27272a",
+    "border_light": "rgba(255, 255, 255, 0.1)",
+    "text": {
+      "primary": "#fafafa",
+      "secondary": "#a1a1aa",
+      "accent": "#fca5a5",
+      "inverse": "#09090b"
+    },
+    "status": {
+      "success": "#10b981",
+      "warning": "#f59e0b",
+      "error": "#ef4444"
+    }
+  },
+  "layout_spacing": {
+    "grid_system": "Control Room Grid (grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6) for Dashboard. Grid Borders style (visible grid lines) for tracking data.",
+    "spacing_scale": "Generous spacing (p-6, p-8) for Rites and Contemplative sections. Dense spacing (p-4, gap-4) for Meal Plans and Calendars.",
+    "container_borders": "All surfaced containers must have 1px border-zinc-800 to separate from the deep background.",
+    "alignment": "Left-aligned for all list/read heavy data. Optical alignment on buttons."
+  },
+  "components_strategy": {
+    "cards": "Flat, 1px solid subtle border, no shadow, #18181b background. Hover states include a slight border color shift to zinc-600.",
+    "navigation": "Crystal Glassmorphism: bg-black/60 backdrop-blur-xl border-b border-white/10.",
+    "buttons": "Primary: Solid #dc2626 with text-white, sharp corners or very slight radius (rounded-sm). Secondary: Transparent with 1px border-zinc-700 and text-zinc-300 hover:bg-zinc-800.",
+    "ai_tutor": "The Tracing Beam component style. When the Vel'nar AI is actively listening/speaking, surround the microphone or interface with an animated gradient border (red/amber) and a blur-md glow.",
+    "data_display": "Shadcn UI Tables and Lists but styled with the 'Grid Borders' micro-theme: border-collapse, exposed right and bottom borders for grid items."
+  },
+  "motion_and_interaction": {
+    "hover": "Subtle border color shifts (zinc-800 -> zinc-600), explicit text color changes to prevent contrast loss.",
+    "focus": "ring-2 ring-red-500/50 ring-offset-2 ring-offset-zinc-950",
+    "transitions": "transition-all duration-300 ease-in-out",
+    "ai_pulse": "Pulse animation for the voice recognition listening state using Tailwind animate-pulse combined with ring-4 ring-red-900/50."
+  },
+  "accessibility": {
+    "contrast": "Text over backgrounds must meet APCA/WCAG AA standards. Heavy text-shadow on text overlapping images.",
+    "motion": "Respect prefers-reduced-motion for the AI tracing beam.",
+    "test_ids": "All interactive elements MUST have role-based kebab-case data-testid (e.g., 'velnar-mic-button', 'complete-rite-button')."
+  },
+  "media_and_images": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1698788067684-2053c651bfed?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHxmb3JnZSUyMGZpcmUlMjBkYXJrfGVufDB8fHx8MTc3NTMzNzgwN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Blacksmith hammer on wood for the 'Forge' and sovereignty theme background",
+      "placement": "Hero Section / Onboarding"
+    },
+    "meditation_practice": {
+      "url": "https://images.unsplash.com/photo-1769133755091-945858d2073b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwzfHxtZWRpdGF0aW9uJTIwZGFyayUyMHNoYWRvd3xlbnwwfHx8fDE3NzUzMzc3ODZ8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Stone buddha statue with halo against dark background",
+      "placement": "Evening Contemplative Guide / Rites"
+    },
+    "warrior_practice": {
+      "url": "https://images.unsplash.com/photo-1746960854615-d99ee8e55b96?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxzYW11cmFpJTIwc3dvcmQlMjBkYXJrfGVufDB8fHx8MTc3NTMzNzgwN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "A man kneels with swords in a dramatic pose",
+      "placement": "Warrior Practice Tracker (Iaido, Systema)"
+    },
+    "rite_challenge_coin": {
+      "url": "https://images.unsplash.com/photo-1667403332341-061cc1cb0add?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHxmb3JnZSUyMGZpcmUlMjBkYXJrfGVufDB8fHx8MTc3NTMzNzgwN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Fire burning in the dark",
+      "placement": "Rite of the Uncrowned completion screen (Challenge coin backdrop)"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Do NOT use 'Inter' for headings. Install and use Google Fonts: 'Cormorant Garamond' and 'Manrope'.",
+    "Implement WebLLM for the local Vel'nar AI tutor and integrate the Web Speech API for real-time pronunciation teaching.",
+    "The application is local and free, so use localStorage or IndexedDB for saving state (daily planner, meals, progression, calendar). No auth required.",
+    "For the daily planner, implement a checklist system specifically tracking 'Morning Sovereignty Declaration' and 'Evening Inventory'.",
+    "For the meal plan, include a calendar structure mapping 30 days of recipes.",
+    "The Rite of the Uncrowned section must walk the user through the rite and, upon completion, display a link to challengecoins4less.com to order the coin.",
+    "Use Phosphor Icons or Lucide React (lucide-react is preinstalled, use it).",
+    "Follow 'Grid Borders' style for tracking tables, ensuring borders are visible and structural.",
+    "Incorporate a 3D or visual pulse effect around the AI tutor microphone when listening (Tracing Beam concept).",
+    "Avoid fully rounded corners; stick to rounded-none or rounded-sm for the disciplined, brutalist aesthetic.",
+    "Always apply data-testid to critical buttons (calendar-date, start-practice, submit-speech, complete-rite)."
+  ]
+}
