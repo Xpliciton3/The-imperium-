@@ -1,7 +1,7 @@
 # The Imperium - Product Requirements Document
 
 ## Overview
-A comprehensive personal coaching and lifestyle app for the Sovereign Traditions system. Built for a single user (The Uncrowned / INTJ) as a life guide with AI-powered features, daily planning, martial arts tracking, ceremonial walkthroughs, and language learning.
+A comprehensive personal coaching and lifestyle app for the Sovereign Traditions system (INTJ cognitive architecture). Built as a single-user life guide with AI features, daily planning, martial arts tracking, ceremonial walkthroughs, language learning, and maximum-detail instructions for everything.
 
 ## Tech Stack
 - **Frontend**: React, Tailwind CSS, shadcn/ui
@@ -11,97 +11,53 @@ A comprehensive personal coaching and lifestyle app for the Sovereign Traditions
 
 ## Architecture
 ```
-/app/
-├── backend/
-│   ├── server.py (FastAPI, MongoDB, Gemini endpoints)
-│   ├── data/
-│   │   ├── ritual_preparations.py (Teas, oils, burning substances with sourcing)
-│   │   ├── shadow_and_values.py (Shadow chapters, moral architecture, cognitive functions)
-│   │   ├── training_nutrition.py (Training regimen 4 phases, nutritional architecture)
-│   │   └── expanded_doctrines.py (Full doctrines w/ Vel'nar, glossary, additional meditations)
-│   ├── requirements.txt
-│   └── .env
-├── frontend/src/
-│   ├── App.js (14 routes)
-│   ├── components/ (Layout, DoctrinesPanel, ui/)
-│   ├── pages/
-│   │   ├── Dashboard.jsx
-│   │   ├── VelnarTutor.jsx (AI chat with Gemini)
-│   │   ├── Translator.jsx (AI MBTI communication translator)
-│   │   ├── DailyPlanner.jsx (Daily practices, hydration tracker, streak display)
-│   │   ├── ShadowWork.jsx (Cognitive functions, 5 shadow chapters, moral architecture)
-│   │   ├── TrainingRegimen.jsx (4-phase physical training program)
-│   │   ├── NutritionalArchitecture.jsx (Nutrition with foods, supplements, sample day)
-│   │   ├── RitualPreparations.jsx (Teas, oils, burning substances with sourcing)
-│   │   ├── GlossaryPage.jsx (5-category searchable glossary)
-│   │   ├── MealPlan.jsx (30-day meal plan)
-│   │   ├── WarriorPractices.jsx (Martial arts + workout logging)
-│   │   ├── RiteOfUncrowned.jsx (24-hour fast warning + permanent record)
-│   │   ├── Meditations.jsx (16 meditation types with detailed instructions)
-│   │   └── CalendarPage.jsx
-│   └── hooks/useLocalStorage.js
+/app/backend/
+├── server.py (FastAPI, MongoDB, Gemini endpoints)
+├── data/
+│   ├── ritual_preparations.py (Teas, oils, burning substances with detailed sourcing)
+│   ├── shadow_and_values.py (Shadow chapters, moral architecture, cognitive functions)
+│   ├── training_nutrition.py (Training regimen 4 phases, nutritional architecture)
+│   ├── expanded_doctrines.py (6 full doctrines w/ Vel'nar, glossary, 8 additional meditations)
+│   ├── meal_plan_full.py (30 complete recipes with ingredients/method/cost/tip + 30-day schedule)
+│   └── velnar_language.py (Full language guide: root houses, grammar, script, stages)
+/app/frontend/src/
+├── App.js (15 routes)
+├── components/ (Layout, DoctrinesPanel, ui/)
+├── pages/ (15 pages)
 ```
 
-## Implemented Features (All Tested - Feb 2026)
+## All Implemented Features
 
-### Core Features (Session 1)
-- [x] Dashboard with quick links
+### Core (Session 1)
+- [x] Dashboard with quick links, meal preview, streak display
 - [x] Vel'nar AI Tutor (Gemini-powered conversational chat with voice TTS/STT)
-- [x] Daily Planner (morning/evening practices, weekly sharpening, activity logging)
-- [x] 30-Day Meal Plan with recipes
-- [x] Warrior Practices (Iaido, Kyudo, Systema, Throwing Daggers with stage progression)
-- [x] Rite of the Uncrowned (6-stage ceremony with permanent record saving to MongoDB)
-- [x] Meditations (8 types with detailed beginner walkthroughs)
+- [x] Daily Planner (morning/evening practices, activity logging, hydration tracker, streak display)
+- [x] Warrior Practices (Iaido, Kyudo, Systema, Throwing Daggers + workout logging with sets/reps/duration)
+- [x] Rite of the Uncrowned (6-stage ceremony, prominent 24-hour fast warning, permanent record saving)
+- [x] Meditations (16 types with detailed beginner walkthroughs)
 - [x] Calendar page
-- [x] Doctrines Quick Access Panel (Litany line-by-line breakdown)
+- [x] Doctrines Quick Access Panel (full expanded text, Vel'nar forms, pronunciation, when-to-use, line-by-line)
 
-### Session 2 (Current) - All Passing 100%
-- [x] **MBTI Communication Translator** (AI-powered via Gemini, INTJ ↔ ESFJ and 8 types)
-- [x] **Hydration Tracker** (glasses counter, +/- buttons, progress bar, MongoDB persistent)
-- [x] **Streak Tracking** (current streak, longest streak, total days from MongoDB)
-- [x] **Workout Logging** (sets/reps/duration per exercise, stored in MongoDB)
-- [x] **24-Hour Fast Warning** (prominent red box on Rite page with full explanation)
-- [x] **Shadow Work page** (8 cognitive functions in Vel'nar, 5 shadow chapters with grip states, moral architecture with 8 values)
-- [x] **Training Regimen page** (4 phases: Foundation → Development → Strength → Built, with exercises)
-- [x] **Nutritional Architecture page** (Core principles, foods, supplements, sample day, hydration protocol)
-- [x] **Ritual Preparations page** (4 sacred blends, 4 essential oils, 4 burning substances, ALL with detailed sourcing)
-- [x] **Glossary page** (5 categories: Beebe Model, Japanese Martial Arts, Vel'nar Language, Philosophical, Meditation)
-- [x] **Expanded Doctrines** (Full text, Vel'nar forms with pronunciation guides, when-to-use guidance)
-- [x] **Additional Meditations** (8 new types: After-Action Stillness, Analytical Contemplation, Lectio Divina, Pre-Sleep Architecture Review, Dream Journaling, Progressive Muscle Relaxation, Sound & Frequency Work, Visualization)
-- [x] App name "The Imperium" consistent throughout
+### Session 2 (Tracking + New Sections)
+- [x] MBTI Communication Translator (live chat AI, INTJ ↔ ESFJ default, 8 types)
+- [x] Hydration Tracker (MongoDB persistent, +/- buttons, progress bar)
+- [x] Streak Tracking (current/longest/total from MongoDB)
+- [x] Workout Logging (sets/reps/duration per exercise, MongoDB)
+- [x] Shadow Work (8 cognitive functions in Vel'nar, 5 shadow chapters with grip states, moral architecture with 8 values)
+- [x] Training Regimen (4 phases: Foundation → Development → Strength → Built)
+- [x] Nutritional Architecture (core principles, foods, supplements, sample day, hydration protocol)
+- [x] Ritual Preparations (4 blends, 4 oils, 4 burning substances, ALL with detailed sourcing)
+- [x] Glossary (5 categories: Beebe, Japanese, Vel'nar, Philosophical, Meditation)
 
-## API Endpoints
-- `POST /api/chat` - Vel'nar AI tutor
-- `POST /api/translator/translate` - MBTI communication translator
-- `GET /api/practices/daily` - Daily practices schedule
-- `GET /api/warrior/practices` - Warrior practice data
-- `GET /api/meals/plan` - 30-day meal plan
-- `GET /api/rites/uncrowned` - Rite ceremony data
-- `POST /api/rites/complete` - Save rite completion record
-- `GET /api/meditations` - Meditation types
-- `GET /api/practices/meditations/all` - All 16 meditations
-- `GET /api/doctrines` - Doctrines data
-- `GET /api/doctrines/expanded` - Full doctrines with Vel'nar
-- `GET /api/shadow` - Shadow chapters
-- `GET /api/moral-architecture` - 8 moral values
-- `GET /api/cognitive-functions` - 8 functions in Vel'nar
-- `GET /api/ritual-preparations` - Teas, oils, sourcing
-- `GET /api/training-regimen` - 4-phase program
-- `GET /api/nutritional-architecture` - Nutrition data
-- `GET /api/glossary` - 5-category glossary
-- `POST /api/tracking/hydration` - Log water intake
-- `GET /api/tracking/hydration/{date}` - Get hydration for date
-- `POST /api/tracking/workout` - Log workout (sets/reps)
-- `GET /api/tracking/workouts` - Recent workouts
-- `POST /api/tracking/activity` - Log daily activity (for streaks)
-- `GET /api/tracking/streak` - Get streak stats
+### Session 3 (Full Content Depth)
+- [x] 30-Day Meal Plan with 30 COMPLETE recipes (full ingredients, step-by-step method, cost per serving, batch tips, budget strategy, pantry staples)
+- [x] Expanded Doctrines Panel (full text, short form, Vel'nar form with pronunciation guide, speaking guide, when-to-use, explanation, line-by-line breakdown for Litany)
+- [x] Translator rebuilt as live chat interface (conversation history, copy to clipboard, settings panel)
+- [x] Vel'nar Language Guide (6 root houses, 12 core roots, derivational markers, word order patterns, breath rules, 4 heart phrase categories, shadow lexicon, 5 rite phrase categories, 5-stage learning path, 3 script modes with inscription rules)
+- [x] Dashboard fix: handles full recipe objects from updated API
 
-## Integrations
-- **Gemini 3 Flash** via Emergent LLM Key (chat tutor + translator)
-
-## Upcoming / Backlog Tasks
+## Upcoming / Backlog
 - P1: Daily Walkthrough scheduler (step-by-step guided daily flow with ceremony scheduling)
-- P2: LLM budget error handling (graceful "top up" message when budget depleted)
+- P2: LLM budget error handling (graceful "top up" message)
 - P2: Progress visualization charts
 - P3: Export/import data functionality
-- P3: Auto-delete data based on retention settings synced to backend
