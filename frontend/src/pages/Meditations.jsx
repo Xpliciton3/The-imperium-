@@ -170,9 +170,32 @@ export default function Meditations() {
                 <p className="text-sm text-zinc-400">{selectedMeditation.description}</p>
               )}
             </CardHeader>
-            <CardContent className="space-y-8">
+            <CardContent className="space-y-6">
+              {/* Beginner Instructions - shown when meditation selected but not running */}
+              {selectedMeditation && !isRunning && selectedMeditation.beginner_instructions && (
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-sm">
+                  <p className="overline text-amber-400 mb-3">Beginner Instructions</p>
+                  <ol className="space-y-2">
+                    {selectedMeditation.beginner_instructions.map((inst, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs mt-0.5">
+                          {idx + 1}
+                        </span>
+                        {inst}
+                      </li>
+                    ))}
+                  </ol>
+                  {selectedMeditation.why_we_do_this && (
+                    <div className="mt-4 pt-4 border-t border-amber-500/20">
+                      <p className="text-xs text-zinc-500 mb-1">Why we do this:</p>
+                      <p className="text-sm text-zinc-400 italic">{selectedMeditation.why_we_do_this}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Timer Display */}
-              <div className="text-center py-12">
+              <div className="text-center py-8">
                 <div 
                   className={cn(
                     "inline-flex items-center justify-center w-64 h-64 rounded-full border-4 transition-all duration-300",

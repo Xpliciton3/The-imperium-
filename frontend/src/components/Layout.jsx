@@ -9,9 +9,11 @@ import {
   Moon, 
   CalendarDays,
   Menu,
-  X
+  X,
+  ScrollText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DoctrinesPanel from "@/components/DoctrinesPanel";
 
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/artifacts/9g8ehgnc_6221.png";
 
@@ -28,6 +30,7 @@ const navItems = [
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [doctrinesOpen, setDoctrinesOpen] = useState(false);
   const location = useLocation();
 
   return (
@@ -93,6 +96,16 @@ export default function Layout() {
               </NavLink>
             );
           })}
+
+          {/* Doctrines Quick Access */}
+          <button
+            onClick={() => setDoctrinesOpen(true)}
+            data-testid="open-doctrines"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 border-l-2 border-transparent text-amber-500 hover:bg-amber-500/10 hover:border-l-amber-500 mt-4"
+          >
+            <ScrollText className="w-5 h-5" />
+            The Doctrines
+          </button>
         </nav>
 
         {/* Footer */}
@@ -116,6 +129,9 @@ export default function Layout() {
       <main className="md:ml-64 min-h-screen">
         <Outlet />
       </main>
+
+      {/* Doctrines Panel */}
+      <DoctrinesPanel isOpen={doctrinesOpen} onClose={() => setDoctrinesOpen(false)} />
     </div>
   );
 }

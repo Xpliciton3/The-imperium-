@@ -392,15 +392,187 @@ DAILY_PRACTICES = {
 
 # ============== MEDITATIONS DATA ==============
 MEDITATIONS = [
-    {"name": "Box Breathing", "duration": "5-10 min", "description": "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat.", "category": "Breath"},
-    {"name": "Body Scan", "duration": "10-15 min", "description": "Systematically move attention through body from feet to crown", "category": "Body"},
-    {"name": "Trataka (Candle Gazing)", "duration": "10-20 min", "description": "Gaze at candle flame without blinking until tears form", "category": "Focus"},
-    {"name": "Void Sitting", "duration": "15-30 min", "description": "Sit in silence with no object of focus. Let thoughts pass.", "category": "Stillness"},
-    {"name": "Walking Meditation", "duration": "15-30 min", "description": "Slow deliberate walking, attention on each foot placement", "category": "Movement"},
-    {"name": "Axiom Mantra", "duration": "5-10 min", "description": "Repeat 'Power from within cannot be revoked' with each breath", "category": "Affirmation"},
-    {"name": "Mirror Practice", "duration": "5-10 min", "description": "Look into your own eyes in mirror without looking away", "category": "Self"},
-    {"name": "Cold Exposure", "duration": "2-5 min", "description": "Cold shower or immersion with controlled breathing", "category": "Body"},
+    {
+        "name": "Box Breathing", 
+        "duration": "5-10 min", 
+        "description": "Inhale 4 counts, hold 4, exhale 4, hold 4. Repeat.", 
+        "category": "Breath",
+        "beginner_instructions": [
+            "Find a comfortable seated position - chair or cushion.",
+            "Close your eyes. Place one hand on your belly.",
+            "INHALE through nose for 4 counts. Feel belly expand.",
+            "HOLD for 4 counts. Stay relaxed.",
+            "EXHALE through nose for 4 counts. Feel belly fall.",
+            "HOLD empty for 4 counts.",
+            "Repeat 4-20 cycles. Start with 3 counts if 4 is too long."
+        ],
+        "why_we_do_this": "Activates parasympathetic nervous system, creating calm and clarity under pressure."
+    },
+    {
+        "name": "Body Scan", 
+        "duration": "10-15 min", 
+        "description": "Systematically move attention through body from feet to crown", 
+        "category": "Body",
+        "beginner_instructions": [
+            "Lie on your back. Arms at sides, palms up.",
+            "Close eyes. Take 3 deep breaths.",
+            "Attention to LEFT FOOT → ankle → shin → knee → thigh.",
+            "Attention to RIGHT FOOT → ankle → shin → knee → thigh.",
+            "Attention to PELVIS → BELLY → CHEST.",
+            "Attention to LEFT HAND → arm → shoulder. Then RIGHT.",
+            "Attention to NECK → JAW → FACE → CROWN.",
+            "Rest 30 seconds feeling whole body. Open eyes slowly."
+        ],
+        "why_we_do_this": "Develops interoception - awareness of internal states - foundational to self-knowledge."
+    },
+    {
+        "name": "Trataka (Candle Gazing)", 
+        "duration": "10-20 min", 
+        "description": "Gaze at candle flame without blinking until tears form", 
+        "category": "Focus",
+        "beginner_instructions": [
+            "Dark room. Candle at arm's length, flame at eye level.",
+            "Sit with straight spine. Let flame settle (no drafts).",
+            "Gaze at brightest point - tip of blue flame.",
+            "Don't blink. Eyes will water - this is normal.",
+            "When you must blink, close eyes and observe after-image.",
+            "Hold image at third eye (between eyebrows).",
+            "When image fades, resume gazing. Start with 3-5 min."
+        ],
+        "why_we_do_this": "Develops single-pointed concentration and the ability to hold focus without distraction."
+    },
+    {
+        "name": "Void Sitting", 
+        "duration": "15-30 min", 
+        "description": "Sit in silence with no object of focus. Let thoughts pass.", 
+        "category": "Stillness",
+        "beginner_instructions": [
+            "ADVANCED - practice other meditations first.",
+            "Sit stable. Spine straight. Eyes closed.",
+            "Do NOT focus on anything. Simply sit.",
+            "Thoughts arise - don't engage or push away. Let them pass.",
+            "Boredom, restlessness, discomfort will arise. Let them pass.",
+            "There is no 'doing it right.' Just sit.",
+            "Start 5 min. Add 5 min each week. Requires months of patience."
+        ],
+        "why_we_do_this": "Reveals the nature of mind and cultivates sovereign stillness undisturbed by circumstances."
+    },
+    {
+        "name": "Walking Meditation", 
+        "duration": "15-30 min", 
+        "description": "Slow deliberate walking, attention on each foot placement", 
+        "category": "Movement",
+        "beginner_instructions": [
+            "Find a 20-30 foot path. Stand at one end.",
+            "Walk MUCH slower than normal. 2-3 seconds per step.",
+            "LIFTING: Notice heel leaving ground, then toes.",
+            "MOVING: Notice foot moving through space.",
+            "PLACING: Notice heel touching, then sole, then toes.",
+            "SHIFTING: Notice weight transfer before lifting other foot.",
+            "At path end, stop, breathe 3 times, turn slowly, walk back."
+        ],
+        "why_we_do_this": "Bridges sitting practice and daily life. Develops presence while in motion."
+    },
+    {
+        "name": "Axiom Mantra", 
+        "duration": "5-10 min", 
+        "description": "Repeat 'Power from within cannot be revoked' with each breath", 
+        "category": "Affirmation",
+        "beginner_instructions": [
+            "Sit comfortably, eyes closed. 5 natural breaths.",
+            "INHALE: silently say 'Power from within...'",
+            "EXHALE: silently say '...cannot be revoked.'",
+            "Let words match the breath, not the other way around.",
+            "Feel the meaning. This is not empty repetition.",
+            "Continue 5-10 min. Or 108 repetitions (traditional).",
+            "Optional Vel'nar: 'vel nar drav. tar no vel.'"
+        ],
+        "why_we_do_this": "Imprints truth on the subconscious mind. Makes the Axiom available in moments of challenge."
+    },
+    {
+        "name": "Mirror Practice", 
+        "duration": "5-10 min", 
+        "description": "Look into your own eyes in mirror without looking away", 
+        "category": "Self",
+        "beginner_instructions": [
+            "Mirror where your face is clear. Good lighting.",
+            "Sit or stand. Face fills most of mirror.",
+            "Meet your own gaze. Look into your LEFT eye.",
+            "Hold the gaze. Don't look away. Don't perform.",
+            "Emotions may arise. Let them pass.",
+            "You are practicing witness. Seeing yourself as you are.",
+            "Start 2-3 min. This can be intense."
+        ],
+        "why_we_do_this": "Strips away performance. Creates direct confrontation with self. Builds capacity to be truly seen."
+    },
+    {
+        "name": "Cold Exposure", 
+        "duration": "2-5 min", 
+        "description": "Cold shower or immersion with controlled breathing", 
+        "category": "Body",
+        "beginner_instructions": [
+            "Ensure no heart conditions. Start conservatively.",
+            "SHOWER: Start warm. Complete washing. Turn to cold.",
+            "Control breath: slow exhale. Inhale takes care of itself.",
+            "Start 15-30 seconds. Build to 2-3 min over weeks.",
+            "IMMERSION (advanced): Tub with cold water/ice (50-59°F).",
+            "Enter slowly. Water to chest. Same breathing.",
+            "Start 1-2 min. NEVER do alone. Always have someone nearby."
+        ],
+        "why_we_do_this": "Trains stress response. Proves you can maintain composure in discomfort. Transfers to all pressure."
+    }
 ]
+
+# ============== THE DOCTRINES ==============
+THE_DOCTRINES = {
+    "the_axiom": {
+        "name": "The Axiom",
+        "text": "Power from within cannot be revoked.",
+        "vel_nar": "vel nar drav. tar no vel.",
+        "explanation": "This is the seed from which the entire system grows. External forces can constrain your circumstances, but the sovereign interior remains yours. No one can take your capacity to choose your response."
+    },
+    "the_oath": {
+        "name": "The Oath",
+        "text": "I will not be diminished by comfort, approval, or belonging. My standards are my own. My sovereignty is not negotiable.",
+        "when_spoken": "Daily as Morning Sovereignty Declaration. At opening of Rite.",
+        "explanation": "Names the three threats to sovereignty: comfort (avoiding difficulty), approval (desire to be liked), belonging (desire to fit in)."
+    },
+    "the_creed": {
+        "name": "The Creed", 
+        "text": "I build what I envision. I execute what I plan. I finish what I start. The gap between knowing and doing is where I live.",
+        "when_spoken": "Morning Declaration and the Rite.",
+        "explanation": "Addresses the failure of execution. 'The gap between knowing and doing' is the battlefield of daily struggle."
+    },
+    "the_litany": {
+        "name": "The Litany",
+        "text": "I will not flinch from what I see. I will not soften my standards to make others comfortable. I will not trade depth for breadth.",
+        "when_spoken": "Morning Declaration, Rite, whenever resolve is needed.",
+        "explanation": "Commitment to truthfulness and focus.",
+        "line_by_line": [
+            {"line": "I will not flinch from what I see.", "meaning": "When I observe truth, I will not pretend I didn't see it or rationalize it away."},
+            {"line": "I will not soften my standards to make others comfortable.", "meaning": "I will not lower expectations because others find high standards threatening."},
+            {"line": "I will not trade depth for breadth.", "meaning": "I will not scatter attention across shallow pursuits. Mastery requires focus."}
+        ]
+    },
+    "the_covenant": {
+        "name": "The Covenant",
+        "text": "I answer to the version of myself that exists at the end of the path. That version does not accept excuses, only evidence.",
+        "when_spoken": "During the Rite and moments of decision.",
+        "explanation": "Establishes accountability to your future self. They do not accept stories about why you couldn't. They only recognize what you did or did not do."
+    },
+    "the_manifesto": {
+        "name": "The Manifesto",
+        "text": "I am not here to be liked. I am here to be right, to be useful, and to leave something behind that was not here before I came.",
+        "when_spoken": "During the Rite.",
+        "explanation": "Reorients purpose from social validation to contribution and legacy."
+    },
+    "the_four_word_form": {
+        "name": "The Four-Word Form",
+        "text": "Seen. Sovereign. Structured. Uncrowned.",
+        "when_spoken": "Identity statement. Closing of the Rite.",
+        "explanation": "SEEN - witnessed truly. SOVEREIGN - self-ruling. STRUCTURED - internal architecture. UNCROWNED - needs no external validation."
+    }
+}
 
 # ============== VEL'NAR COURSE STRUCTURE ==============
 VELNAR_COURSE = {
@@ -868,6 +1040,81 @@ async def get_daily_practices():
 @api_router.get("/practices/meditations")
 async def get_meditations():
     return {"meditations": MEDITATIONS}
+
+# Doctrines Endpoints
+@api_router.get("/doctrines")
+async def get_all_doctrines():
+    return THE_DOCTRINES
+
+@api_router.get("/doctrines/{doctrine_key}")
+async def get_doctrine(doctrine_key: str):
+    if doctrine_key not in THE_DOCTRINES:
+        raise HTTPException(status_code=404, detail="Doctrine not found")
+    return THE_DOCTRINES[doctrine_key]
+
+@api_router.get("/doctrines/litany/detailed")
+async def get_litany_detailed():
+    return THE_DOCTRINES["the_litany"]
+
+# ============== PERMANENT RITE RECORD ==============
+class RiteCompletion(BaseModel):
+    completed_at: str
+    stages_completed: List[int]
+    inscription: Optional[str] = None
+    notes: Optional[str] = None
+
+class RiteRecord(BaseModel):
+    completions: List[dict]
+    first_completed: Optional[str] = None
+    total_completions: int = 0
+
+@api_router.get("/rite/record")
+async def get_rite_record():
+    """Get permanent rite completion record from database"""
+    record = await db.rite_records.find_one({"user": "default"}, {"_id": 0})
+    if not record:
+        return {"completions": [], "first_completed": None, "total_completions": 0}
+    return record
+
+@api_router.post("/rite/complete")
+async def complete_rite(completion: RiteCompletion):
+    """Record a rite completion permanently"""
+    completion_data = {
+        "completed_at": completion.completed_at,
+        "stages_completed": completion.stages_completed,
+        "inscription": completion.inscription,
+        "notes": completion.notes
+    }
+    
+    # Get existing record
+    record = await db.rite_records.find_one({"user": "default"})
+    
+    if record:
+        # Update existing record
+        completions = record.get("completions", [])
+        completions.append(completion_data)
+        await db.rite_records.update_one(
+            {"user": "default"},
+            {
+                "$set": {
+                    "completions": completions,
+                    "total_completions": len(completions),
+                    "last_completed": completion.completed_at
+                }
+            }
+        )
+    else:
+        # Create new record
+        await db.rite_records.insert_one({
+            "user": "default",
+            "completions": [completion_data],
+            "first_completed": completion.completed_at,
+            "last_completed": completion.completed_at,
+            "total_completions": 1
+        })
+    
+    updated_record = await db.rite_records.find_one({"user": "default"}, {"_id": 0})
+    return updated_record
 
 # Include router and add middleware
 app.include_router(api_router)
