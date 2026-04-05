@@ -98,6 +98,265 @@ function SkillBlock({ skill }) {
   );
 }
 
+function ExpandedReference({ practice }) {
+  const [openSections, setOpenSections] = useState({});
+  const toggle = (key) => setOpenSections(p => ({ ...p, [key]: !p[key] }));
+
+  return (
+    <Card className="bg-[#18181b] border-zinc-800" data-testid="expanded-reference">
+      <CardHeader className="pb-3">
+        <CardTitle className="heading-4 flex items-center gap-2">
+          <BookOpen className="w-4 h-4 text-emerald-400" />
+          Training Reference
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {/* Body Map */}
+        {practice.body_map && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("body_map")}>
+              <p className="text-sm font-medium text-zinc-200">Body Map</p>
+              {openSections.body_map ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.body_map && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {Object.entries(practice.body_map).map(([k, v]) => (
+                  <div key={k} className="p-2 bg-zinc-900/50 rounded-sm">
+                    <p className="text-xs text-red-400 font-medium mb-1 capitalize">{k.replace(/_/g, " ")}</p>
+                    <p className="text-sm text-zinc-300">{v}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Drill Menu */}
+        {practice.drill_menu?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("drills")}>
+              <p className="text-sm font-medium text-zinc-200">Drill Menu</p>
+              {openSections.drills ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.drills && (
+              <div className="p-4 bg-[#111113] overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-zinc-800">
+                      <th className="text-left p-2 text-xs text-zinc-500 font-medium">Drill</th>
+                      <th className="text-left p-2 text-xs text-zinc-500 font-medium">Purpose</th>
+                      <th className="text-left p-2 text-xs text-zinc-500 font-medium">Dose</th>
+                      <th className="text-left p-2 text-xs text-zinc-500 font-medium">Watch For</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {practice.drill_menu.map((d, i) => (
+                      <tr key={i} className="border-b border-zinc-800/50">
+                        <td className="p-2 text-zinc-200 font-medium">{d.drill}</td>
+                        <td className="p-2 text-zinc-400">{d.purpose}</td>
+                        <td className="p-2 text-emerald-400 font-mono text-xs">{d.dose}</td>
+                        <td className="p-2 text-amber-400/70 text-xs">{d.watch_for}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Faults & Corrections */}
+        {practice.faults_and_corrections?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("faults")}>
+              <p className="text-sm font-medium text-zinc-200">Common Faults & Corrections</p>
+              {openSections.faults ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.faults && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {practice.faults_and_corrections.map((f, i) => (
+                  <div key={i} className="p-3 bg-zinc-900/50 rounded-sm">
+                    <p className="text-sm text-amber-400 mb-1">{f.fault}</p>
+                    <p className="text-sm text-zinc-300">{f.correction}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Week Progression */}
+        {practice.week_progression?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("weeks")}>
+              <p className="text-sm font-medium text-zinc-200">Week-by-Week Progression</p>
+              {openSections.weeks ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.weeks && (
+              <div className="p-4 space-y-2 bg-[#111113]">
+                {practice.week_progression.map((w, i) => (
+                  <div key={i} className="flex gap-3 p-2 bg-zinc-900/50 rounded-sm">
+                    <span className="text-red-400 font-mono text-xs shrink-0 pt-0.5">W{w.weeks}</span>
+                    <p className="text-sm text-zinc-300">{w.focus}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Self-Audit */}
+        {practice.self_audit?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("audit")}>
+              <p className="text-sm font-medium text-zinc-200">Self-Audit Questions</p>
+              {openSections.audit ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.audit && (
+              <div className="p-4 space-y-2 bg-[#111113]">
+                {practice.self_audit.map((q, i) => (
+                  <p key={i} className="text-sm text-zinc-300 pl-4 relative before:content-[''] before:w-1.5 before:h-1.5 before:bg-red-500 before:rounded-full before:absolute before:left-0 before:top-2">{q}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Core Principles Expanded (Systema) */}
+        {practice.core_principles_expanded?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("principles")}>
+              <p className="text-sm font-medium text-zinc-200">Core Principles</p>
+              {openSections.principles ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.principles && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {practice.core_principles_expanded.map((p, i) => (
+                  <div key={i} className="p-3 bg-zinc-900/50 rounded-sm border-l-2 border-red-600">
+                    <p className="text-sm font-medium text-zinc-200 mb-1">{p.principle}</p>
+                    <p className="text-sm text-zinc-400">{p.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Solo Modules (Systema) */}
+        {practice.solo_modules?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("solo")}>
+              <p className="text-sm font-medium text-zinc-200">Solo Training Modules</p>
+              {openSections.solo ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.solo && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {practice.solo_modules.map((m, i) => (
+                  <div key={i} className="p-3 bg-zinc-900/50 rounded-sm">
+                    <p className="text-sm font-medium text-emerald-400 mb-1">{m.module}</p>
+                    <p className="text-sm text-zinc-300">{m.instructions}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Partner Progression (Systema) */}
+        {practice.partner_progression?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("partner")}>
+              <p className="text-sm font-medium text-zinc-200">Partner Progression</p>
+              {openSections.partner ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.partner && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {practice.partner_progression.map((p, i) => (
+                  <div key={i} className="p-3 bg-zinc-900/50 rounded-sm">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="text-xs">Stage {p.stage}</Badge>
+                      <p className="text-sm font-medium text-zinc-200">{p.name}</p>
+                    </div>
+                    <div className="grid gap-2 text-sm">
+                      <div><span className="text-xs text-zinc-500">Partner:</span> <span className="text-zinc-400">{p.partner_task}</span></div>
+                      <div><span className="text-xs text-zinc-500">You:</span> <span className="text-zinc-300">{p.your_task}</span></div>
+                      <div><span className="text-xs text-zinc-500">Standard:</span> <span className="text-emerald-400">{p.standard}</span></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Failure Patterns (Systema) */}
+        {practice.failure_patterns?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("failures")}>
+              <p className="text-sm font-medium text-zinc-200">Common Failure Patterns</p>
+              {openSections.failures ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.failures && (
+              <div className="p-4 space-y-3 bg-[#111113]">
+                {practice.failure_patterns.map((f, i) => (
+                  <div key={i} className="p-3 bg-zinc-900/50 rounded-sm">
+                    <p className="text-sm text-amber-400 mb-1">{f.pattern}</p>
+                    <p className="text-sm text-zinc-300">{f.correction}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Preparatory Capacities (Kyudo) */}
+        {practice.preparatory_capacities?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("prep")}>
+              <p className="text-sm font-medium text-zinc-200">Preparatory Capacities</p>
+              {openSections.prep ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.prep && (
+              <div className="p-4 space-y-2 bg-[#111113]">
+                {practice.preparatory_capacities.map((c, i) => (
+                  <p key={i} className="text-sm text-zinc-300 pl-4 relative before:content-[''] before:w-1.5 before:h-1.5 before:bg-emerald-500 before:rounded-full before:absolute before:left-0 before:top-2">{c}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Proficiency Standards (Kyudo) */}
+        {practice.proficiency_standards?.length > 0 && (
+          <div className="border border-zinc-800 rounded-sm overflow-hidden">
+            <div className="p-3 bg-zinc-900/50 cursor-pointer flex items-center justify-between" onClick={() => toggle("standards")}>
+              <p className="text-sm font-medium text-zinc-200">Proficiency Standards</p>
+              {openSections.standards ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+            </div>
+            {openSections.standards && (
+              <div className="p-4 space-y-2 bg-[#111113]">
+                {practice.proficiency_standards.map((s, i) => (
+                  <p key={i} className="text-sm text-zinc-300 pl-4 relative before:content-[''] before:w-1.5 before:h-1.5 before:bg-red-500 before:rounded-full before:absolute before:left-0 before:top-2">{s}</p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Self-Teaching Boundaries */}
+        {practice.self_teaching_boundaries && (
+          <div className="p-3 bg-amber-600/5 border border-amber-600/20 rounded-sm">
+            <p className="text-xs text-amber-400 font-medium mb-1 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" /> Self-Teaching Boundaries
+            </p>
+            <p className="text-sm text-zinc-300">{practice.self_teaching_boundaries}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function WarriorPractices() {
   const [practices, setPractices] = useState(null);
   const [warriorProgress, setWarriorProgress] = useLocalStorage("warrior_progress", {
@@ -236,6 +495,11 @@ export default function WarriorPractices() {
                   ))}
                 </CardContent>
               </Card>
+            )}
+
+            {/* Expanded Reference Sections */}
+            {(practice?.body_map || practice?.drill_menu || practice?.faults_and_corrections || practice?.core_principles_expanded || practice?.solo_modules || practice?.partner_progression) && (
+              <ExpandedReference practice={practice} />
             )}
 
             {/* Stage Selector */}

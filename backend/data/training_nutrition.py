@@ -8,6 +8,30 @@ TRAINING_REGIMEN = {
             {"name": "Skill", "description": "Iaido and Kyudo — which develop Se, Ni, Te, and Fi simultaneously."}
         ]
     },
+    "session_architecture": {
+        "description": "Every training session follows this structure regardless of the discipline being practiced.",
+        "phases": [
+            {"phase": "Arrive and Orient", "duration": "2 minutes", "instructions": "Quiet standing or seated breathing. Name the purpose of the session in one sentence."},
+            {"phase": "Joint Preparation", "duration": "3 minutes", "instructions": "Neck gentle range, shoulders, wrists, hips, knees, ankles, and trunk wake-up work."},
+            {"phase": "Pattern Rehearsal", "duration": "Variable", "instructions": "Practice the day's forms or drills at the easiest quality-preserving level."},
+            {"phase": "Focused Block", "duration": "Variable", "instructions": "Choose one technical variable only: line, grip, breath, timing, foot placement, recovery, or release."},
+            {"phase": "Integration Block", "duration": "Variable", "instructions": "Combine elements into short uninterrupted sequences."},
+            {"phase": "Cool-Down and Logging", "duration": "5 minutes", "instructions": "Down-regulate breath, note faults, write next session's single correction."}
+        ]
+    },
+    "proficiency_model": [
+        {"tier": "Novice", "description": "Learns positions, names, sequence, and safety. Needs frequent pauses.", "priority": "Shape, vocabulary, safe handling, slow reps"},
+        {"tier": "Apprentice", "description": "Performs short blocks consistently at slow speed with fewer gross errors.", "priority": "Consistency, correction, breath, transitions"},
+        {"tier": "Practitioner", "description": "Maintains form under light fatigue and can self-correct in real time.", "priority": "Durability, diagnostic ability, rhythm"},
+        {"tier": "Advanced Practitioner", "description": "Integrates technical work with pressure, tempo changes, and mixed demands.", "priority": "Adaptation, economy, composure, scenario use"}
+    ],
+    "twelve_month_roadmap": [
+        {"months": "1-3", "focus": "Shape, safety, and honest logging. Learn to set posture, breathe on purpose, perform low-complexity repetitions, and leave each session with one clear correction. Impatience is the main enemy."},
+        {"months": "4-6", "focus": "Repeatability. Film regularly. Compare takes. Demand that the first repetition and the fifth look like they came from the same nervous system. Strength and aerobic work should now be consistent enough that technical sessions feel physically supported."},
+        {"months": "7-9", "focus": "Pressure without panic. Add longer uninterrupted sequences, mild threshold drills, slightly longer expansion holds, and transitions between arts. Preserving line when the task becomes less convenient."},
+        {"months": "10-12", "focus": "Expression through simplicity. Explain the basic purpose of each form, perform them without theatrics, recover from minor errors without emotional derailment, and use the logbook to self-correct with increasing maturity."}
+    ],
+    "logbook_standard": "After every session, record: date, session type, one technical focus, what improved, one fault identified, and next session's correction target. The logbook is the primary driver for intelligent practice and self-correction.",
     "phases": [
         {
             "phase": 1,
@@ -247,6 +271,62 @@ NUTRITIONAL_ARCHITECTURE = {
             }
         ]
     },
+    "recipes": [
+        {
+            "name": "Lemon Salmon with Greens and Sweet Potato",
+            "meal": "First Meal — 12pm",
+            "ingredients": ["4 to 6 ounces salmon fillet", "1 teaspoon olive oil", "1/4 to 1/2 lemon", "Pinch of kosher salt", "Pinch of black pepper", "1 to 2 cups spinach, arugula, or kale", "1/2 medium sweet potato", "1/2 avocado", "Fermented food on the side: kimchi, sauerkraut, or kefir"],
+            "sourcing": "Salmon from seafood counter or freezer; olive oil from pantry aisle; lemon and greens from produce; avocado from produce; sweet potato from produce; fermented foods from refrigerated natural foods section or international aisle.",
+            "instructions": [
+                "Sweet potato: Wash and dry. Pierce several times with a fork. Roast at 400F on a sheet pan for 40 to 55 minutes until a knife slides in without resistance. Or microwave: pierce, wrap in a damp paper towel, and cook on high 5 to 8 minutes until soft. Cut open and set aside.",
+                "Salmon: Pat dry. Rub with olive oil, salt, pepper, and lemon juice. Place on a parchment-lined sheet pan or skillet. Bake at 400F for 12 to 15 minutes until opaque and flaky but not dry; or pan-sear skin-side down in a hot skillet with 1 teaspoon oil for 4 minutes, flip, and cook 3 more minutes.",
+                "Greens: If using spinach or arugula, serve raw and dress with 1 teaspoon olive oil plus a squeeze of lemon. If using kale, massage raw leaves with a pinch of salt and olive oil for 30 seconds until they soften; or sauté briefly in a hot pan with a drop of oil.",
+                "Assembly: Place greens on the plate first, then salmon, then sweet potato, then avocado slices, then the fermented item on the side. Eat the protein first."
+            ]
+        },
+        {
+            "name": "Four-Egg Cognitive Plate",
+            "meal": "First Meal — 12pm (alternate)",
+            "ingredients": ["4 whole eggs", "1 teaspoon butter or olive oil", "1 to 2 cups spinach", "1/2 cup cooked quinoa or brown rice", "1/2 avocado", "Salt, pepper", "Optional fresh parsley or chive"],
+            "sourcing": "Eggs and butter in dairy; olive oil and grains in pantry aisle; spinach, avocado, and parsley in produce.",
+            "instructions": [
+                "Cook quinoa or rice in advance for the week according to package directions, or use a plain microwave cup.",
+                "Heat a skillet over medium heat. Add butter or oil. Crack in the eggs and cook to your preference — scrambled slowly over low-medium heat stays softer and more digestible; over-easy or sunny-side-up keeps the yolk liquid, which preserves more choline.",
+                "Warm the quinoa briefly in the microwave or alongside the eggs in a corner of the pan.",
+                "Plate: quinoa base, spinach alongside (raw or briefly wilted in the egg pan), eggs on top, avocado sliced beside, salt, pepper, herbs. Eat the eggs first."
+            ]
+        },
+        {
+            "name": "Controlled Recovery Snack",
+            "meal": "Afternoon — 3 to 4pm",
+            "ingredients": ["1 ounce mixed nuts or pumpkin seeds", "1 to 2 ounces dark chocolate 70% or higher", "Optional protein shake with water or unsweetened milk"],
+            "sourcing": "Nuts and seeds in bulk bins, baking aisle, or snack aisle; dark chocolate in candy or natural foods section; protein powder in supplements or natural foods.",
+            "instructions": [
+                "Portion the nuts and chocolate into a bowl or container rather than eating from the original package.",
+                "If using a protein shake, add one scoop of protein to cold water or unsweetened almond/oat milk and shake or blend.",
+                "Eat the protein component first if using the shake, then the nuts, then the chocolate. This is a bridge, not a second meal."
+            ]
+        },
+        {
+            "name": "Lean Protein, Roasted Vegetables, and Broth",
+            "meal": "Final Meal — 7 to 8pm",
+            "ingredients": ["6 to 8 ounces chicken breast, thigh, lean beef, turkey, white fish, or salmon", "2 cups vegetables: broccoli, carrots, Brussels sprouts, cauliflower, zucchini, peppers, or sweet potato", "1 tablespoon avocado oil or olive oil", "Salt, pepper, garlic powder", "1 cup bone broth", "Optional: half cup rice, quinoa, or roasted potato on training days", "Optional: 200-300ml tart cherry juice"],
+            "sourcing": "Proteins from meat or seafood counters; vegetables from produce or freezer section; avocado oil from pantry aisle; bone broth from soup aisle, refrigerated section, or homemade.",
+            "instructions": [
+                "Roasting vegetables: Heat oven to 425F. Cut vegetables into similar-size pieces so they cook evenly. Toss with oil, salt, pepper, and garlic powder on a sheet pan. Spread in a single layer. Roast 20 to 30 minutes, turning once, until edges are browned and centers are tender.",
+                "Protein: Chicken breast bakes at 400F for 20 to 25 minutes; thighs 25 to 35; white fish 12 to 15; salmon 12 to 15; lean beef pan-sears in a hot skillet 3 to 4 minutes per side for medium. Rest the meat 5 minutes before cutting.",
+                "Bone broth: Heat 1 cup gently on the stove or microwave until hot. Add a pinch of salt, black pepper, and optionally a tiny piece of fresh ginger or turmeric.",
+                "Assembly: Protein on one side, vegetables covering most of the plate, starch if included, broth in a separate cup to sip between bites. Eat protein first, then vegetables, then starch if included."
+            ]
+        }
+    ],
+    "weekly_prep_protocol": "Once per week: buy proteins, greens, root vegetables, fruit, fermented support foods, and pantry items in one run. Cook at least one tray of roasted vegetables and one batch of grain or root vegetable so weekday assembly takes 10 to 15 minutes per meal. Pre-portion snack containers with nuts and chocolate. If using bone broth, buy pre-made or prepare a batch on a rest day by simmering bones, water, apple cider vinegar, and aromatics for 12 to 24 hours, then strain and refrigerate or freeze in single-serving containers.",
+    "progress_markers": [
+        "Week 1: Complete one full grocery run from the sourcing guide and prepare at least two recipes exactly as written.",
+        "Week 4: All four recipes prepared without referencing the instructions. Meal timing and fasting window consistent five or more days per week.",
+        "Week 8: Energy between meals is stable. No blood sugar crashes. Cognitive clarity during morning fasting window is noticeably better than baseline.",
+        "Week 12: Consistent meal prep. Supplements taken daily. Body composition and training performance both improving."
+    ],
     "hydration": {
         "formula": "Body weight in pounds divided by 2, in ounces daily (minimum)",
         "note": "Dehydration of 2% body weight measurably impairs working memory, attention, and executive function.",

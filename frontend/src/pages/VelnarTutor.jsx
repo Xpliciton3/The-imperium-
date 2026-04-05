@@ -48,6 +48,8 @@ const TUTOR_PERSONALITY = {
 export default function VelnarTutor() {
   const [vocabulary, setVocabulary] = useState(null);
   const [course, setCourse] = useState(null);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState(null);
   const [courseProgress, setCourseProgress] = useLocalStorage("velnar_course_progress", {
     currentLevel: 1,
     currentLesson: "1-1",
@@ -62,7 +64,7 @@ export default function VelnarTutor() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
-  const [activeTab, setActiveTab] = useState("course");
+  const [activeTab, setActiveTab] = useState("conversation");
   const [selectedLesson, setSelectedLesson] = useState(null);
   
   const recognitionRef = useRef(null);
@@ -72,51 +74,73 @@ export default function VelnarTutor() {
 
   // Load data
   useEffect(() => {
+    setDataLoading(true);
+    setDataError(null);
     Promise.all([
-      fetch(`${BACKEND_URL}/api/velnar/vocabulary`).then(r => r.json()),
-      fetch(`${BACKEND_URL}/api/velnar/course`).then(r => r.json())
+      fetch(`${BACKEND_URL}/api/velnar/vocabulary`).then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch(`${BACKEND_URL}/api/velnar/course`).then(r => r.ok ? r.json() : null).catch(() => null)
     ])
       .then(([vocabData, courseData]) => {
-        setVocabulary(vocabData);
-        setCourse(courseData);
-        // Set initial lesson
-        const firstLevel = courseData.levels?.[0];
-        const firstLesson = firstLevel?.lessons?.[0];
-        if (firstLesson) {
-          setSelectedLesson({ level: firstLevel, lesson: firstLesson });
+        if (vocabData) setVocabulary(vocabData);
+        if (courseData) {
+          setCourse(courseData);
+          const firstLevel = courseData.levels?.[0];
+          const firstLesson = firstLevel?.lessons?.[0];
+          if (firstLesson) {
+            setSelectedLesson({ level: firstLevel, lesson: firstLesson });
+          }
+        }
+        if (!vocabData && !courseData) {
+          setDataError("Could not load course data. The Conversation tab is still available.");
         }
       })
-      .catch(console.error);
+      .catch(err => {
+        console.warn("Failed to load tutor data:", err);
+        setDataError("Could not load course data. The Conversation tab is still available.");
+      })
+      .finally(() => setDataLoading(false));
   }, []);
 
-  // Initialize speech recognition
+  // Initialize speech recognition - with safety checks for all browser APIs
   useEffect(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setSpeechSupported(false);
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionRef.current = new SpeechRecognition();
-    recognitionRef.current.continuous = false;
-    recognitionRef.current.interimResults = true;
-    recognitionRef.current.lang = 'en-US';
-
-    recognitionRef.current.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map(result => result[0].transcript)
-        .join('');
-      setUserInput(transcript);
-      
-      if (event.results[0].isFinal) {
-        handleSendMessage(transcript);
+    try {
+      // Check speechSynthesis availability first
+      if (typeof window !== 'undefined' && typeof window.speechSynthesis !== 'undefined') {
+        synthRef.current = window.speechSynthesis;
       }
-    };
 
-    recognitionRef.current.onerror = () => setIsListening(false);
-    recognitionRef.current.onend = () => setIsListening(false);
+      // Check speech recognition availability
+      const hasSpeechRecognition = typeof window !== 'undefined' && 
+        (typeof window.SpeechRecognition !== 'undefined' || typeof window.webkitSpeechRecognition !== 'undefined');
 
-    synthRef.current = window.speechSynthesis;
+      if (!hasSpeechRecognition) {
+        setSpeechSupported(false);
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        setUserInput(transcript);
+        
+        if (event.results[0].isFinal) {
+          handleSendMessage(transcript);
+        }
+      };
+
+      recognitionRef.current.onerror = () => setIsListening(false);
+      recognitionRef.current.onend = () => setIsListening(false);
+    } catch (err) {
+      console.warn("Speech API initialization failed:", err);
+      setSpeechSupported(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -135,17 +159,22 @@ export default function VelnarTutor() {
   };
 
   const speakText = (text, slow = false) => {
-    if (!synthRef.current) return;
-    synthRef.current.cancel();
+    try {
+      if (!synthRef.current) return;
+      synthRef.current.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = slow ? 0.6 : 0.8;
-    utterance.pitch = 0.9;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = slow ? 0.6 : 0.8;
+      utterance.pitch = 0.9;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
 
-    synthRef.current.speak(utterance);
+      synthRef.current.speak(utterance);
+    } catch (err) {
+      console.warn("TTS error:", err);
+      setIsSpeaking(false);
+    }
   };
 
   const stopSpeaking = () => {
@@ -300,7 +329,24 @@ What draws your attention?`;
 
             {/* Course Tab */}
             <TabsContent value="course">
-              {selectedLesson ? (
+              {dataLoading ? (
+                <Card className="bg-[#18181b] border-zinc-800">
+                  <CardContent className="p-12 flex flex-col items-center justify-center gap-3">
+                    <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                    <p className="text-sm text-zinc-400">Loading course material...</p>
+                  </CardContent>
+                </Card>
+              ) : dataError && !selectedLesson ? (
+                <Card className="bg-[#18181b] border-zinc-800">
+                  <CardContent className="p-12 flex flex-col items-center justify-center gap-3">
+                    <AlertCircle className="w-8 h-8 text-amber-500" />
+                    <p className="text-sm text-zinc-400">{dataError}</p>
+                    <Button variant="outline" size="sm" onClick={() => setActiveTab("conversation")} data-testid="switch-to-conversation">
+                      Go to Conversation
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : selectedLesson ? (
                 <Card className="bg-[#18181b] border-zinc-800">
                   <CardHeader>
                     <div className="flex items-center justify-between">
