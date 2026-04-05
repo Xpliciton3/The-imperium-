@@ -21,6 +21,7 @@ from data.training_nutrition import TRAINING_REGIMEN, NUTRITIONAL_ARCHITECTURE
 from data.expanded_doctrines import EXPANDED_DOCTRINES, GLOSSARY, ADDITIONAL_MEDITATIONS
 from data.meal_plan_full import MEAL_PLAN_META, RECIPES as FULL_RECIPES, DAYS_30
 from data.velnar_language import VELNAR_LANGUAGE_GUIDE
+from data.warrior_practices_full import WARRIOR_PRACTICES_FULL
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
@@ -1042,13 +1043,13 @@ async def get_recipe(recipe_name: str):
 # Warrior Practices Endpoints
 @api_router.get("/warrior/practices")
 async def get_warrior_practices():
-    return WARRIOR_PRACTICES
+    return WARRIOR_PRACTICES_FULL
 
 @api_router.get("/warrior/practices/{practice}")
 async def get_warrior_practice(practice: str):
-    if practice not in WARRIOR_PRACTICES:
+    if practice not in WARRIOR_PRACTICES_FULL:
         raise HTTPException(status_code=404, detail="Practice not found")
-    return WARRIOR_PRACTICES[practice]
+    return WARRIOR_PRACTICES_FULL[practice]
 
 # Rite Endpoints
 @api_router.get("/rite")
