@@ -197,18 +197,30 @@ export const mealWeeks = [
       {
         day: 'Tuesday',
         meals: [
-          { type: 'Breakfast', title: 'Scrambled eggs on toast', ingredients: [
-            { name: 'Eggs', amount: '2', onlineAvailable: true },
-            { name: 'Bread', amount: '2 slices', onlineAvailable: true }
-          ]},
-          { type: 'Lunch', title: 'Leftover spaghetti', ingredients: [
-            { name: 'Spaghetti leftovers', amount: '1 serving', onlineAvailable: false }
-          ]},
-          { type: 'Dinner', title: 'Sheet pan chicken thighs with potatoes and broccoli', ingredients: [
-            { name: 'Chicken thighs', amount: '1.5 lb', onlineAvailable: true },
-            { name: 'Potatoes', amount: '4 medium', onlineAvailable: true },
-            { name: 'Broccoli', amount: '2 crowns', onlineAvailable: true }
-          ]}
+          {
+            type: 'Breakfast',
+            title: 'Scrambled eggs on toast',
+            ingredients: [
+              { name: 'Eggs', amount: '2', onlineAvailable: true },
+              { name: 'Bread', amount: '2 slices', onlineAvailable: true }
+            ]
+          },
+          {
+            type: 'Lunch',
+            title: 'Leftover spaghetti',
+            ingredients: [
+              { name: 'Spaghetti leftovers', amount: '1 serving', onlineAvailable: false }
+            ]
+          },
+          {
+            type: 'Dinner',
+            title: 'Sheet pan chicken thighs with potatoes and broccoli',
+            ingredients: [
+              { name: 'Chicken thighs', amount: '1.5 lb', onlineAvailable: true },
+              { name: 'Potatoes', amount: '4 medium', onlineAvailable: true },
+              { name: 'Broccoli', amount: '2 crowns', onlineAvailable: true }
+            ]
+          }
         ]
       }
     ]
@@ -216,7 +228,7 @@ export const mealWeeks = [
 ];
 
 export const plannerTemplates = {
-  preRite: [
+  'pre-rite': [
     { id: 'open', title: 'Opening / Orientation', duration: 5, category: 'planner' },
     { id: 'doctrine', title: 'Doctrine study', duration: 15, category: 'doctrine', link: '/doctrine' },
     { id: 'velnar', title: 'Vel’nar foundations', duration: 15, category: 'velnar', link: '/tutor' },
@@ -224,7 +236,7 @@ export const plannerTemplates = {
     { id: 'meal-review', title: 'Meal & grocery review', duration: 10, category: 'meal', link: '/meals' },
     { id: 'reflection', title: 'Reflection / readiness note', duration: 5, category: 'reflection' }
   ],
-  postRite: [
+  'post-rite': [
     { id: 'wake', title: 'Wake / Opening', duration: 5, category: 'planner' },
     { id: 'morning-practice', title: 'Morning practice', duration: 15, category: 'warrior', link: '/warrior' },
     { id: 'tea', title: 'Tea', duration: 10, category: 'meal', link: '/meals' },
