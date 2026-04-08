@@ -1,57 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
-  BookOpen, 
-  Calendar, 
-  Utensils, 
-  Sword, 
-  Crown, 
-  Moon,
-  CheckCircle2,
-  Circle,
-  ArrowRight,
-  Mic
+  BookOpen, Calendar, Utensils, Sword, Crown, Moon,
+  CheckCircle2, Circle, ArrowRight, Mic, ShoppingCart, FileText
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useImperiumApp } from "@/lib/useImperiumApp";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/artifacts/9g8ehgnc_6221.png";
 
 export default function Dashboard() {
-  const [dailyPractices] = useLocalStorage("daily_practices", {
-    morning: [],
-    evening: [],
-    date: null
-  });
+  const { state, content, readinessSummary, markPlannerStep } = useImperiumApp();
   const [warriorProgress] = useLocalStorage("warrior_progress", {});
-  const [riteCompleted] = useLocalStorage("rite_completed", false);
   const [currentDay] = useLocalStorage("meal_plan_day", 1);
   const [mealPlan, setMealPlan] = useState(null);
 
+  const steps = content.plannerTemplates[state.phase] || [];
+  const todayLogs = state.plannerLogs[new Date().toISOString().slice(0, 10)] || [];
+  const spineProgress = steps.length ? Math.round((todayLogs.length / steps.length) * 100) : 0;
+
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/meals/plan/${currentDay}`)
-      .then(res => res.json())
-      .then(data => setMealPlan(data))
-      .catch(console.error);
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setMealPlan(data); })
+      .catch(() => {});
   }, [currentDay]);
 
-  const morningComplete = dailyPractices.morning?.length >= 4;
-  const eveningComplete = dailyPractices.evening?.length >= 4;
-  const todayDate = new Date().toDateString();
-  const isPracticeToday = dailyPractices.date === todayDate;
-
   const quickLinks = [
-    { path: "/velnar", icon: Mic, label: "Practice Vel'nar", color: "text-red-500" },
-    { path: "/planner", icon: Calendar, label: "Daily Practice", color: "text-amber-500" },
-    { path: "/meals", icon: Utensils, label: "Today's Meals", color: "text-emerald-500" },
+    { path: "/doctrine", icon: FileText, label: "Doctrine", color: "text-red-500" },
+    { path: "/tutor", icon: Mic, label: "Vel'nar Tutor", color: "text-red-400" },
+    { path: "/meals", icon: Utensils, label: "Meals & Grocery", color: "text-emerald-500" },
     { path: "/warrior", icon: Sword, label: "Warrior Training", color: "text-blue-500" },
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="p-6 lg:p-8 space-y-8" data-testid="dashboard-page">
       {/* Hero Section */}
       <div className="relative h-64 rounded-sm overflow-hidden bg-[#18181b] border border-zinc-800">
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
@@ -70,6 +57,54 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Today Spine */}
+      <Card className="bg-[#18181b] border-zinc-800" data-testid="today-spine">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="heading-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-amber-500" />
+              Today Spine
+            </CardTitle>
+            <Link to="/planner" className="text-sm text-red-400 hover:text-red-300">Open planner</Link>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-3">
+            <Progress value={spineProgress} className="h-2.5 flex-1" />
+            <span className="text-sm text-zinc-400 shrink-0">{todayLogs.length}/{steps.length}</span>
+          </div>
+          <div className="grid gap-2">
+            {steps.map((step, i) => {
+              const done = todayLogs.includes(step.id);
+              return (
+                <div key={step.id} className="flex items-center gap-3 p-3 bg-zinc-900/50 rounded-sm">
+                  <button
+                    onClick={() => markPlannerStep(step.id)}
+                    className="shrink-0"
+                    data-testid={`spine-step-${step.id}`}
+                  >
+                    {done ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-zinc-600 hover:text-zinc-400" />
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${done ? "text-zinc-500 line-through" : "text-zinc-200"}`}>
+                      {step.title}
+                    </p>
+                  </div>
+                  <span className="text-xs text-zinc-600 shrink-0">{step.duration}m</span>
+                  {step.link && (
+                    <Link to={step.link} className="text-xs text-red-400 hover:text-red-300 shrink-0">Go</Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Links */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -90,44 +125,44 @@ export default function Dashboard() {
 
       {/* Main Grid */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Daily Practices Status */}
-        <Card className="bg-[#18181b] border-zinc-800">
+        {/* Readiness Engine */}
+        <Card className="bg-[#18181b] border-zinc-800" data-testid="readiness-card">
           <CardHeader>
             <CardTitle className="heading-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-amber-500" />
-              Today's Practices
+              <Crown className="w-5 h-5 text-red-500" />
+              Rite Readiness
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-sm">
-              <div className="flex items-center gap-3">
-                {isPracticeToday && morningComplete ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                ) : (
-                  <Circle className="w-5 h-5 text-zinc-600" />
-                )}
-                <span className="text-sm">Morning Sovereignty</span>
+            {state.riteCompletedAt ? (
+              <div className="text-center py-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                <p className="text-sm text-emerald-400 font-medium">Rite Completed</p>
+                <p className="text-xs text-zinc-500 mt-1">{new Date(state.riteCompletedAt).toLocaleDateString()}</p>
               </div>
-              <span className="text-xs text-zinc-500">
-                {isPracticeToday ? dailyPractices.morning?.length || 0 : 0}/4
-              </span>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-sm">
-              <div className="flex items-center gap-3">
-                {isPracticeToday && eveningComplete ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                ) : (
-                  <Circle className="w-5 h-5 text-zinc-600" />
+            ) : (
+              <>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-zinc-100">{readinessSummary.ratio}%</p>
+                  <p className={`text-sm mt-1 ${
+                    readinessSummary.verdict === 'Rite-Ready' ? 'text-emerald-400' :
+                    readinessSummary.verdict === 'Nearly Ready' ? 'text-amber-400' :
+                    readinessSummary.verdict === 'Developing' ? 'text-blue-400' : 'text-zinc-500'
+                  }`}>{readinessSummary.verdict}</p>
+                </div>
+                {readinessSummary.blockedBy.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-zinc-500">Still needed:</p>
+                    {readinessSummary.blockedBy.slice(0, 3).map((item) => (
+                      <p key={item} className="text-xs text-amber-400/70 pl-3">{item}</p>
+                    ))}
+                  </div>
                 )}
-                <span className="text-sm">Evening Inventory</span>
-              </div>
-              <span className="text-xs text-zinc-500">
-                {isPracticeToday ? dailyPractices.evening?.length || 0 : 0}/4
-              </span>
-            </div>
-            <Link to="/planner">
+              </>
+            )}
+            <Link to="/rite">
               <Button variant="ghost" className="w-full justify-between text-zinc-400 hover:text-zinc-100">
-                Go to Planner
+                {state.riteCompletedAt ? "View Rite Record" : "Open Rite"}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -167,81 +202,64 @@ export default function Dashboard() {
             ) : (
               <p className="text-sm text-zinc-500">Loading meal plan...</p>
             )}
+            <div className="flex items-center gap-2 text-xs text-zinc-500 pt-1">
+              <ShoppingCart className="w-3 h-3" />
+              Store: {state.storeList.length} items | Online: {state.onlineList.length} items
+            </div>
             <Link to="/meals">
               <Button variant="ghost" className="w-full justify-between text-zinc-400 hover:text-zinc-100">
-                View Full Plan
+                View Full Plan & Grocery Lists
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        {/* Rite Status */}
-        <Card className="bg-[#18181b] border-zinc-800">
+        {/* Doctrine Quick Access */}
+        <Card className="bg-[#18181b] border-zinc-800" data-testid="doctrine-quick">
           <CardHeader>
             <CardTitle className="heading-4 flex items-center gap-2">
-              <Crown className="w-5 h-5 text-red-500" />
-              Rite of the Uncrowned
+              <FileText className="w-5 h-5 text-amber-500" />
+              Doctrine
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {riteCompleted ? (
-              <div className="text-center py-4">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-                <p className="text-sm text-emerald-400 font-medium">Rite Completed</p>
-                <p className="text-xs text-zinc-500 mt-1">You have crossed the threshold</p>
-                <a 
-                  href="https://www.challengecoins4less.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  data-testid="challenge-coin-link"
-                  className="mt-4 inline-block"
-                >
-                  <Button className="btn-primary">
-                    Order Challenge Coin
-                  </Button>
-                </a>
+          <CardContent className="space-y-3">
+            {content.doctrineLibrary.map((entry) => (
+              <div key={entry.id} className="p-3 bg-zinc-900/50 rounded-sm">
+                <p className="text-sm font-medium text-zinc-200">{entry.title}</p>
+                <p className="text-xs text-zinc-500 mt-1">{entry.quick || entry.emergency}</p>
               </div>
-            ) : (
-              <div className="text-center py-4">
-                <img src={LOGO_URL} alt="The Imperium" className="w-12 h-12 mx-auto mb-3" />
-                <p className="text-sm text-zinc-400">The forge awaits</p>
-                <p className="text-xs text-zinc-600 mt-1">Begin your initiation</p>
-                <Link to="/rite" className="mt-4 inline-block">
-                  <Button className="btn-primary" data-testid="begin-rite-btn">
-                    Begin the Rite
-                  </Button>
-                </Link>
-              </div>
-            )}
+            ))}
+            <Link to="/doctrine">
+              <Button variant="ghost" className="w-full justify-between text-zinc-400 hover:text-zinc-100">
+                Open Doctrine
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
 
-      {/* Warrior Practices Overview */}
+      {/* Warrior Practices */}
       <Card className="bg-[#18181b] border-zinc-800">
         <CardHeader>
           <CardTitle className="heading-4 flex items-center gap-2">
             <Sword className="w-5 h-5 text-blue-500" />
-            Warrior Practices Progress
+            Warrior Practices
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {["iaido", "kyudo", "systema", "throwing_daggers"].map((practice) => {
               const progress = warriorProgress[practice] || { stage: 1, progress: 0 };
-              const stages = practice === "throwing_daggers" ? 4 : 5;
-              const overallProgress = ((progress.stage - 1) / stages) * 100 + (progress.progress / stages);
-              
+              const overallProgress = ((progress.stage - 1) / 5) * 100 + (progress.progress / 5);
               return (
                 <div key={practice} className="p-4 bg-zinc-900/50 rounded-sm">
                   <p className="text-sm font-medium text-zinc-200 capitalize mb-2">
                     {practice.replace("_", " ")}
                   </p>
                   <Progress value={overallProgress} className="h-2 mb-2" />
-                  <p className="text-xs text-zinc-500">
-                    Stage {progress.stage} of {stages}
-                  </p>
+                  <p className="text-xs text-zinc-500">Stage {progress.stage} of 5</p>
                 </div>
               );
             })}
@@ -261,9 +279,7 @@ export default function Dashboard() {
         <p className="heading-2 text-zinc-100 italic">
           "Power from within cannot be revoked."
         </p>
-        <p className="small-text mt-4">
-          Seen. Sovereign. Structured. Uncrowned.
-        </p>
+        <p className="small-text mt-4">Seen. Sovereign. Structured. Uncrowned.</p>
       </div>
     </div>
   );

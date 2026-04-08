@@ -21,12 +21,14 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useImperiumApp } from "@/lib/useImperiumApp";
 import { cn } from "@/lib/utils";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/artifacts/9g8ehgnc_6221.png";
 
 export default function RiteOfUncrowned() {
+  const { state: imperiumState, readinessSummary, markReadiness, finalizeRite: imperiumFinalizeRite } = useImperiumApp();
   const [riteData, setRiteData] = useState(null);
   const [permanentRecord, setPermanentRecord] = useState(null);
   const [riteProgress, setRiteProgress] = useLocalStorage("rite_progress", {
@@ -150,6 +152,57 @@ export default function RiteOfUncrowned() {
           </div>
         </div>
       </div>
+
+      {/* Readiness Engine */}
+      <Card className="bg-[#18181b] border-zinc-800" data-testid="readiness-engine">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="heading-4 flex items-center gap-2">
+              <Crown className="w-5 h-5 text-amber-500" />
+              Readiness Assessment
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold text-zinc-100">{readinessSummary.ratio}%</span>
+              <Badge variant="outline" className={cn(
+                "text-xs",
+                readinessSummary.verdict === 'Rite-Ready' ? "text-emerald-400 border-emerald-700" :
+                readinessSummary.verdict === 'Nearly Ready' ? "text-amber-400 border-amber-700" :
+                readinessSummary.verdict === 'Developing' ? "text-blue-400 border-blue-700" :
+                "text-zinc-400 border-zinc-700"
+              )}>{readinessSummary.verdict}</Badge>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Progress value={readinessSummary.ratio} className="h-3 mb-4" />
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {imperiumState.readiness.map((item) => (
+              <div key={item.name} className="p-3 bg-zinc-900/50 rounded-sm" data-testid={`readiness-${item.name.toLowerCase().replace(/\s+/g, '-')}`}>
+                <p className="text-sm font-medium text-zinc-200 mb-2">{item.name}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {['not-started', 'in-progress', 'review', 'complete'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => markReadiness(item.name, status, item.notes)}
+                      className={cn(
+                        "text-xs px-2.5 py-1 rounded-sm border transition-colors",
+                        item.status === status
+                          ? status === 'complete' ? "bg-emerald-600/20 border-emerald-600/50 text-emerald-300"
+                            : status === 'review' ? "bg-blue-600/20 border-blue-600/50 text-blue-300"
+                            : status === 'in-progress' ? "bg-amber-600/20 border-amber-600/50 text-amber-300"
+                            : "bg-zinc-800 border-zinc-700 text-zinc-400"
+                          : "border-zinc-800 text-zinc-600 hover:border-zinc-600 hover:text-zinc-400"
+                      )}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Permanent Record & Status */}
       <div className="grid md:grid-cols-2 gap-4">

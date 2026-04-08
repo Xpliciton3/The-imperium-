@@ -17,15 +17,18 @@ import {
   Apple,
   Flame,
   BookOpenCheck,
-  Languages
+  Languages,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DoctrinesPanel from "@/components/DoctrinesPanel";
+import { useImperiumApp } from "@/lib/useImperiumApp";
 
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/artifacts/9g8ehgnc_6221.png";
 
 const navItems = [
   { path: "/", icon: null, label: "Dashboard", exact: true, useLogo: true },
+  { path: "/doctrine", icon: FileText, label: "Doctrine" },
   { path: "/tutor", icon: BookOpen, label: "Vel'nar Tutor" },
   { path: "/velnar-guide", icon: Languages, label: "Vel'nar Language" },
   { path: "/translator", icon: ArrowRightLeft, label: "Translator" },
@@ -46,6 +49,7 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [doctrinesOpen, setDoctrinesOpen] = useState(false);
   const location = useLocation();
+  const { state } = useImperiumApp();
 
   return (
     <div className="min-h-screen bg-[#09090b]">
@@ -78,6 +82,16 @@ export default function Layout() {
               <h1 className="heading-4 text-zinc-100">The Imperium</h1>
               <p className="text-xs text-zinc-500">Sovereign Traditions</p>
             </div>
+          </div>
+          <div className="mt-3" data-testid="phase-badge">
+            <span className={cn(
+              "text-xs px-2.5 py-1 rounded-sm border",
+              state.phase === 'pre-rite' 
+                ? "text-amber-300 border-amber-700/50 bg-amber-900/20" 
+                : "text-emerald-300 border-emerald-700/50 bg-emerald-900/20"
+            )}>
+              {state.phase === 'pre-rite' ? 'Pre-Rite Mode' : 'Post-Rite Mode'}
+            </span>
           </div>
         </div>
 

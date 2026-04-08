@@ -6,7 +6,10 @@ import {
   Plus,
   X,
   Clock,
-  Tag
+  Tag,
+  ChevronDown,
+  ChevronUp,
+  Crown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useImperiumApp } from "@/lib/useImperiumApp";
 import { cn } from "@/lib/utils";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
@@ -359,6 +363,85 @@ export default function CalendarPage() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Holy Days */}
+      <HolyDays />
+    </div>
+  );
+}
+
+function HolyDays() {
+  const { content } = useImperiumApp();
+  const [expanded, setExpanded] = useState(null);
+
+  return (
+    <div className="space-y-4" data-testid="holy-days">
+      <h2 className="heading-3 text-zinc-100 flex items-center gap-2">
+        <Crown className="w-5 h-5 text-red-500" />
+        Holy Days of the Imperium
+      </h2>
+      <div className="grid md:grid-cols-2 gap-4">
+        {content.holyDays.map((day) => (
+          <Card key={day.id} className="bg-[#18181b] border-zinc-800" data-testid={`holy-day-${day.id}`}>
+            <div className="p-4 cursor-pointer" onClick={() => setExpanded(expanded === day.id ? null : day.id)}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-zinc-100">{day.title}</p>
+                  <p className="text-xs text-red-400 mt-0.5">{day.date} | {day.function}</p>
+                </div>
+                {expanded === day.id ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
+              </div>
+              <p className="text-xs text-zinc-500 mt-2">{day.mood}</p>
+            </div>
+            {expanded === day.id && (
+              <CardContent className="pt-0 space-y-4 border-t border-zinc-800">
+                <div className="p-3 bg-zinc-900/50 rounded-sm mt-3">
+                  <p className="text-xs text-zinc-500 font-medium mb-1">Meaning</p>
+                  <p className="text-sm text-zinc-300">{day.meaning}</p>
+                </div>
+
+                {day.preparation?.length > 0 && (
+                  <div>
+                    <p className="text-xs text-amber-400 font-medium mb-2">Preparation</p>
+                    <div className="space-y-1">
+                      {day.preparation.map((p, i) => (
+                        <p key={i} className="text-xs text-zinc-300 pl-3 relative before:content-[''] before:w-1 before:h-1 before:bg-amber-500 before:rounded-full before:absolute before:left-0 before:top-1.5">{p}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {day.primaryRite?.length > 0 && (
+                  <div>
+                    <p className="text-xs text-red-400 font-medium mb-2">Primary Rite</p>
+                    <ol className="space-y-1">
+                      {day.primaryRite.map((step, i) => (
+                        <li key={i} className="text-xs text-zinc-300 pl-5 relative">
+                          <span className="absolute left-0 text-red-400 font-mono">{i + 1}.</span>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                {day.lawfulWays?.length > 0 && (
+                  <div>
+                    <p className="text-xs text-emerald-400 font-medium mb-2">Four Lawful Ways to Observe</p>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {day.lawfulWays.map((way, i) => (
+                        <div key={i} className="p-2 bg-zinc-900/50 rounded-sm border-l-2 border-red-600">
+                          <p className="text-xs text-zinc-200">{way}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            )}
+          </Card>
+        ))}
       </div>
     </div>
   );
