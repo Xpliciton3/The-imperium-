@@ -1,6 +1,7 @@
-import { doctrineLibrary, holyDays, mealWeeks, plannerTemplates, readinessCategories, extendedGlossary } from '../data/imperiumData';
+import { doctrineLibrary, glossaryTerms, holyDays, mealWeeks, plannerTemplates, readinessCategories, velnarLessons, warriorTracks } from '../data/imperiumData';
 
 const STORAGE_KEY = 'imperium-app-state-v2';
+
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const defaultReadiness = readinessCategories.map((name) => ({
@@ -26,6 +27,12 @@ export const defaultState = {
     { id: 'tea', label: 'Tea', time: '06:30', enabled: false },
     { id: 'litany-close', label: 'Litany / Close', time: '20:30', enabled: true },
   ],
+  calendarEvents: holyDays.map((day) => ({
+    id: day.id,
+    title: day.title,
+    dateKey: day.date,
+    type: 'holy-day',
+  })),
 };
 
 export function loadState() {
@@ -39,32 +46,28 @@ export function loadState() {
 }
 
 export function saveState(state) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // localStorage may be unavailable
-  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
 export function addIngredientToList(state, ingredient, target) {
   const listKey = target === 'online' ? 'onlineList' : 'storeList';
-  const list = [...state[listKey]];
-  const existing = list.find((item) => item.name === ingredient.name);
+  const existing = state[listKey].find((item) => item.name === ingredient.name);
   if (existing) {
     existing.quantity = ingredient.amount || existing.quantity;
     existing.checked = false;
   } else {
-    list.push({
-      id: `${target}-${Date.now()}-${ingredient.name}`,
+    state[listKey].push({
+      id: `${target}-${ingredient.name}`,
       name: ingredient.name,
       quantity: ingredient.amount || '',
       checked: false,
+      onlineAvailable: Boolean(ingredient.onlineAvailable),
       sourceStatus: target === 'online'
-        ? (ingredient.onlineAvailable ? 'Found online' : 'Online source not checked yet')
+        ? ingredient.onlineAvailable ? 'Found online' : 'Online source not checked yet'
         : 'Store item',
     });
   }
-  return { ...state, [listKey]: list };
+  return { ...state, [listKey]: [...state[listKey]] };
 }
 
 export function toggleChecklistItem(state, target, id) {
@@ -72,22 +75,6 @@ export function toggleChecklistItem(state, target, id) {
   return {
     ...state,
     [listKey]: state[listKey].map((item) => (item.id === id ? { ...item, checked: !item.checked } : item)),
-  };
-}
-
-export function removeChecklistItem(state, target, id) {
-  const listKey = target === 'online' ? 'onlineList' : 'storeList';
-  return {
-    ...state,
-    [listKey]: state[listKey].filter((item) => item.id !== id),
-  };
-}
-
-export function clearCheckedItems(state, target) {
-  const listKey = target === 'online' ? 'onlineList' : 'storeList';
-  return {
-    ...state,
-    [listKey]: state[listKey].filter((item) => !item.checked),
   };
 }
 
@@ -121,19 +108,21 @@ export function logPlannerStep(state, stepId) {
 }
 
 export function completeRite(state, notes = '') {
+  const completedAt = new Date().toISOString();
   return {
     ...state,
     phase: 'post-rite',
-    riteCompletedAt: new Date().toISOString(),
+    riteCompletedAt: completedAt,
     riteNotes: notes,
   };
 }
 
 export const staticContent = {
   doctrineLibrary,
+  glossaryTerms,
   holyDays,
   mealWeeks,
   plannerTemplates,
-  readinessCategories,
-  extendedGlossary,
+  velnarLessons,
+  warriorTracks,
 };

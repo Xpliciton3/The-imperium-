@@ -1,13 +1,11 @@
 import React from 'react';
 import {
   addIngredientToList,
-  clearCheckedItems,
   completeRite,
   defaultState,
   getReadinessSummary,
   loadState,
   logPlannerStep,
-  removeChecklistItem,
   saveState,
   staticContent,
   toggleChecklistItem,
@@ -34,8 +32,6 @@ export function ImperiumProvider({ children }) {
       readinessSummary: getReadinessSummary(state),
       addIngredient: (ingredient, target) => setState((prev) => addIngredientToList({ ...prev }, ingredient, target)),
       toggleChecklist: (target, id) => setState((prev) => toggleChecklistItem(prev, target, id)),
-      removeChecklistItem: (target, id) => setState((prev) => removeChecklistItem(prev, target, id)),
-      clearChecked: (target) => setState((prev) => clearCheckedItems(prev, target)),
       markReadiness: (name, status, notes) => setState((prev) => updateReadiness(prev, name, status, notes)),
       markPlannerStep: (stepId) => setState((prev) => logPlannerStep(prev, stepId)),
       setPhase: (phase) => setState((prev) => ({ ...prev, phase })),
