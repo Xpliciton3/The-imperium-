@@ -1,165 +1,60 @@
-import React, { useState } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
-import { 
-  BookOpen, 
-  Calendar, 
-  Utensils, 
-  Sword, 
-  Crown, 
-  Moon, 
-  CalendarDays,
-  Menu,
-  X,
-  ScrollText,
-  ArrowRightLeft,
-  Eye,
-  Dumbbell,
-  Apple,
-  Flame,
-  BookOpenCheck,
-  Languages,
-  FileText
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import DoctrinesPanel from "@/components/DoctrinesPanel";
-import { useImperiumApp } from "@/lib/useImperiumApp";
+import React from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { BookOpen, CalendarDays, Flame, Home, Languages, ScrollText, Sword } from 'lucide-react';
+import { useImperiumApp } from '../lib/useImperiumApp';
 
-const LOGO_URL = "https://customer-assets.emergentagent.com/job_velnar-learn/artifacts/9g8ehgnc_6221.png";
-
-const navItems = [
-  { path: "/", icon: null, label: "Dashboard", exact: true, useLogo: true },
-  { path: "/doctrine", icon: FileText, label: "Doctrine" },
-  { path: "/tutor", icon: BookOpen, label: "Vel'nar Tutor" },
-  { path: "/velnar-guide", icon: Languages, label: "Vel'nar Language" },
-  { path: "/translator", icon: ArrowRightLeft, label: "Translator" },
-  { path: "/planner", icon: Calendar, label: "Daily Walkthrough" },
-  { path: "/shadow", icon: Eye, label: "Shadow Work" },
-  { path: "/training", icon: Dumbbell, label: "Training Regimen" },
-  { path: "/nutrition", icon: Apple, label: "Nutrition" },
-  { path: "/meals", icon: Utensils, label: "Meal Plan" },
-  { path: "/warrior", icon: Sword, label: "Warrior Practices" },
-  { path: "/rite", icon: Crown, label: "Rite of the Uncrowned" },
-  { path: "/meditations", icon: Moon, label: "Meditations" },
-  { path: "/preparations", icon: Flame, label: "Ritual Preparations" },
-  { path: "/calendar", icon: CalendarDays, label: "Calendar" },
-  { path: "/glossary", icon: BookOpenCheck, label: "Glossary" },
+const nav = [
+  { to: '/', label: 'Today', icon: Home },
+  { to: '/planner', label: 'Planner', icon: CalendarDays },
+  { to: '/doctrine', label: 'Doctrine', icon: ScrollText },
+  { to: '/meals', label: 'Meals', icon: Flame },
+  { to: '/tutor', label: 'Vel’nar', icon: Languages },
+  { to: '/warrior', label: 'Warrior', icon: Sword },
+  { to: '/glossary', label: 'Glossary', icon: BookOpen },
 ];
 
 export default function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [doctrinesOpen, setDoctrinesOpen] = useState(false);
   const location = useLocation();
   const { state } = useImperiumApp();
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
-      {/* Mobile menu button */}
-      <button
-        data-testid="mobile-menu-toggle"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 p-2 bg-zinc-900 border border-zinc-800 rounded-sm md:hidden"
-      >
-        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed left-0 top-0 h-full w-64 bg-[#0f0f11] border-r border-zinc-800 z-40 transition-transform duration-300",
-          "md:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {/* Logo / Title */}
-        <div className="p-6 border-b border-zinc-800">
-          <div className="flex items-center gap-3">
-            <img 
-              src={LOGO_URL} 
-              alt="The Imperium Seal" 
-              className="w-12 h-12 object-contain rounded-sm"
-            />
-            <div>
-              <h1 className="heading-4 text-zinc-100">The Imperium</h1>
-              <p className="text-xs text-zinc-500">Sovereign Traditions</p>
-            </div>
+    <div className='min-h-screen bg-neutral-950 text-stone-100'>
+      <header className='sticky top-0 z-20 border-b border-teal-800/60 bg-black/90 backdrop-blur'>
+        <div className='mx-auto flex max-w-6xl items-center justify-between px-4 py-3'>
+          <div>
+            <p className='text-xs uppercase tracking-[0.28em] text-teal-400'>The Imperium</p>
+            <h1 className='text-lg font-semibold text-stone-100'>Uncrowned Operating System</h1>
           </div>
-          <div className="mt-3" data-testid="phase-badge">
-            <span className={cn(
-              "text-xs px-2.5 py-1 rounded-sm border",
-              state.phase === 'pre-rite' 
-                ? "text-amber-300 border-amber-700/50 bg-amber-900/20" 
-                : "text-emerald-300 border-emerald-700/50 bg-emerald-900/20"
-            )}>
-              {state.phase === 'pre-rite' ? 'Pre-Rite Mode' : 'Post-Rite Mode'}
-            </span>
+          <div className='rounded-full border border-teal-700 px-3 py-1 text-xs text-teal-200'>
+            {state.phase === 'pre-rite' ? 'Pre-Rite mode' : 'Post-Rite mode'}
           </div>
         </div>
+      </header>
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = item.exact 
-              ? location.pathname === item.path
-              : location.pathname.startsWith(item.path);
-            
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                data-testid={`nav-${item.label.toLowerCase().replace(/['\s]/g, '-')}`}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 border-l-2",
-                  isActive
-                    ? "text-red-500 border-l-red-500 bg-red-500/5"
-                    : "text-zinc-400 border-transparent hover:text-zinc-100 hover:bg-zinc-900/50"
-                )}
-              >
-                {item.useLogo ? (
-                  <img src={LOGO_URL} alt="" className="w-5 h-5 object-contain" />
-                ) : (
-                  <item.icon className="w-5 h-5" />
-                )}
-                {item.label}
-              </NavLink>
-            );
-          })}
-
-          {/* Doctrines Quick Access */}
-          <button
-            onClick={() => setDoctrinesOpen(true)}
-            data-testid="open-doctrines"
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 border-l-2 border-transparent text-amber-500 hover:bg-amber-500/10 hover:border-l-amber-500 mt-4"
-          >
-            <ScrollText className="w-5 h-5" />
-            The Doctrines
-          </button>
-        </nav>
-
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-zinc-800">
-          <p className="overline text-center">The Uncrowned</p>
-          <p className="text-xs text-zinc-600 text-center mt-1">
-            Power from within cannot be revoked
-          </p>
-        </div>
-      </aside>
-
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main content */}
-      <main className="md:ml-64 min-h-screen">
+      <main className='mx-auto max-w-6xl px-4 pb-28 pt-4'>
         <Outlet />
       </main>
 
-      {/* Doctrines Panel */}
-      <DoctrinesPanel isOpen={doctrinesOpen} onClose={() => setDoctrinesOpen(false)} />
+      <nav className='fixed inset-x-0 bottom-0 z-20 border-t border-teal-800/60 bg-black/95 pb-safe'>
+        <div className='mx-auto grid max-w-6xl grid-cols-4 gap-2 px-2 py-2 sm:grid-cols-7'>
+          {nav.map((item) => {
+            const Icon = item.icon;
+            const active = location.pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] ${
+                  active ? 'bg-teal-900/60 text-teal-200' : 'text-stone-400'
+                }`}
+              >
+                <Icon size={18} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
