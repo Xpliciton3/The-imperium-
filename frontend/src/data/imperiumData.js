@@ -46,6 +46,49 @@ Whatever is denied rules from the dark.`,
   }
 ];
 
+export const glossaryTerms = [
+  {
+    id: 'seiza',
+    term: 'Seiza',
+    plain: 'A formal kneeling posture used for deliberate stillness, readiness, and composure.',
+    full: `Begin by kneeling on a padded surface if needed. Place the knees on the floor roughly hip-width apart unless a narrower ceremonial posture is specifically required. Point the tops of the feet flat against the floor so the toes are extended behind you rather than dug into the ground. Lower the hips carefully toward the heels. Keep the spine tall instead of slumped, the ribs quiet instead of flared, the jaw unclenched, and the shoulders heavy and relaxed.
+
+Hands can rest on the thighs with the palms down for grounded composure or lightly cupped for ceremonial stillness. The posture should feel upright and deliberate, not stiff. If the knees or ankles hurt sharply, use a cushion between the hips and heels, a folded blanket under the shins, or modify to a high kneel. Pain is not mastery. Alignment, breath, and lawful control are the aim.
+
+Common mistakes: collapsing the chest, arching the lower back, pinching the shoulders upward, sitting with all the weight dumped into one side, or forcing the knees into pain for the sake of appearance.`,
+    mistakes: ['Slouching forward', 'Cranking the lower back', 'Ignoring knee or ankle pain', 'Treating pain as discipline'],
+    category: 'warrior'
+  },
+  {
+    id: 'guard',
+    term: 'Guard',
+    plain: 'The ready position from which action can begin or to which you can safely return.',
+    full: 'A guard is not just where the hands go. It is the total ready state of stance, balance, gaze, breath, and structure. In blade work it also determines angle, coverage, and recovery speed.',
+    category: 'warrior'
+  },
+  {
+    id: 'chamber',
+    term: 'Chamber',
+    plain: 'The loaded starting position that prepares a strike or movement pattern.',
+    full: 'A chamber stores direction and intention before motion. It should never be decorative. If a chamber makes you slower, exposed, or unstable, it is wrong for the purpose.',
+    category: 'warrior'
+  },
+  {
+    id: 'vel',
+    term: 'VEL',
+    plain: 'Sovereign choosing; will owned rather than borrowed.',
+    full: 'Vel names self-owned choice. It is not impulse. It is chosen direction held under responsibility.',
+    category: 'velnar'
+  },
+  {
+    id: 'nar',
+    term: 'NAR',
+    plain: 'Held interior; the within that is governed and protected.',
+    full: 'Nar is the inward territory. It is the interior field that must be ruled lawfully rather than surrendered to noise.',
+    category: 'velnar'
+  }
+];
+
 export const holyDays = [
   {
     id: 'empty-throne',
@@ -173,18 +216,18 @@ export const mealWeeks = [
 ];
 
 export const plannerTemplates = {
-  'pre-rite': [
+  preRite: [
     { id: 'open', title: 'Opening / Orientation', duration: 5, category: 'planner' },
     { id: 'doctrine', title: 'Doctrine study', duration: 15, category: 'doctrine', link: '/doctrine' },
-    { id: 'velnar', title: "Vel'nar foundations", duration: 15, category: 'velnar', link: '/tutor' },
+    { id: 'velnar', title: 'Vel’nar foundations', duration: 15, category: 'velnar', link: '/tutor' },
     { id: 'movement', title: 'Foundational movement / posture', duration: 15, category: 'warrior', link: '/warrior' },
     { id: 'meal-review', title: 'Meal & grocery review', duration: 10, category: 'meal', link: '/meals' },
     { id: 'reflection', title: 'Reflection / readiness note', duration: 5, category: 'reflection' }
   ],
-  'post-rite': [
+  postRite: [
     { id: 'wake', title: 'Wake / Opening', duration: 5, category: 'planner' },
     { id: 'morning-practice', title: 'Morning practice', duration: 15, category: 'warrior', link: '/warrior' },
-    { id: 'tea', title: 'Tea', duration: 10, category: 'meal', link: '/preparations' },
+    { id: 'tea', title: 'Tea', duration: 10, category: 'meal', link: '/meals' },
     { id: 'breakfast', title: 'Breakfast', duration: 15, category: 'meal', link: '/meals' },
     { id: 'oath', title: 'Doctrine / Oath prompt', duration: 5, category: 'doctrine', link: '/doctrine' },
     { id: 'midday-practice', title: 'Midday practice', duration: 10, category: 'warrior', link: '/warrior' },
@@ -199,7 +242,7 @@ export const readinessCategories = [
   'Doctrine comprehension',
   'Oath familiarity',
   'Litany familiarity',
-  "Vel'nar foundations",
+  'Vel’nar foundations',
   'Foundational warrior practice',
   'Meal planning',
   'Grocery planning',
@@ -207,29 +250,62 @@ export const readinessCategories = [
   'Rite understanding'
 ];
 
-export const extendedGlossary = [
+export const velnarLessons = [
   {
-    id: 'seiza',
-    term: 'Seiza',
-    plain: 'A formal kneeling posture used for deliberate stillness, readiness, and composure.',
-    full: `Begin by kneeling on a padded surface if needed. Place the knees on the floor roughly hip-width apart. Point the tops of the feet flat against the floor so the toes are extended behind you. Lower the hips carefully toward the heels. Keep the spine tall, the ribs quiet, the jaw unclenched, and the shoulders heavy and relaxed.
+    id: 'sound-1',
+    title: 'Foundations of sound',
+    goal: 'Learn how Vel’nar is supposed to sound before memorizing too many words.',
+    bullets: [
+      'Every word arrives complete.',
+      'Vowels are stable and not swallowed.',
+      'Pacing is deliberate, resonant, and unhurried.'
+    ],
+    test: 'Record yourself saying VEL, NAR, and AN IM-VEL slowly and fully.'
+  },
+  {
+    id: 'root-1',
+    title: 'Core roots: VEL, NAR, REN',
+    goal: 'Associate root meaning, pronunciation, and use.',
+    bullets: [
+      'VEL = sovereign choosing',
+      'NAR = held interior',
+      'REN = truly known / held under witness'
+    ],
+    test: 'Match root, meaning, and pronunciation from memory.'
+  }
+];
 
-Hands can rest on the thighs with palms down for grounded composure or lightly cupped for ceremonial stillness. The posture should feel upright and deliberate, not stiff. If the knees or ankles hurt sharply, use a cushion between the hips and heels.`,
-    mistakes: ['Slouching forward', 'Cranking the lower back', 'Ignoring knee or ankle pain', 'Treating pain as discipline'],
-    category: 'warrior'
+export const warriorTracks = [
+  {
+    id: 'foundations',
+    title: 'Foundations',
+    purpose: 'Build posture, stance, kneeling forms, guard, and recovery before speed or intensity.',
+    stages: [
+      {
+        stage: 'Beginner',
+        focus: 'Alignment, balance, breath, and term comprehension.',
+        drills: ['Seiza posture hold', 'Neutral standing base', 'Basic guard entry and recovery']
+      },
+      {
+        stage: 'Intermediate',
+        focus: 'Consistency, transitions, and control under fatigue.',
+        drills: ['Guard to chamber transitions', 'Timed stance holds', 'Footwork triangle basics']
+      },
+      {
+        stage: 'Advanced',
+        focus: 'Precision, economy, adaptability, and lawful aggression.',
+        drills: ['Pressure transitions', 'Timed movement chains', 'Stress-tested recovery']
+      }
+    ]
   },
   {
-    id: 'guard',
-    term: 'Guard',
-    plain: 'The ready position from which action can begin or to which you can safely return.',
-    full: 'A guard is not just where the hands go. It is the total ready state of stance, balance, gaze, breath, and structure. In blade work it also determines angle, coverage, and recovery speed.',
-    category: 'warrior'
-  },
-  {
-    id: 'chamber',
-    term: 'Chamber',
-    plain: 'The loaded starting position that prepares a strike or movement pattern.',
-    full: 'A chamber stores direction and intention before motion. It should never be decorative. If a chamber makes you slower, exposed, or unstable, it is wrong for the purpose.',
-    category: 'warrior'
+    id: 'blade',
+    title: 'Blade Practice',
+    purpose: 'Integrate reference manual, scoring, distances, timers, and after-action review.',
+    stages: [
+      { stage: 'Beginner', focus: 'Grip, safety, guard, and basic line awareness.', drills: ['Grip check', 'Draw and return', 'Distance awareness'] },
+      { stage: 'Intermediate', focus: 'Entry, angle, recovery, and clean repetition.', drills: ['Angle sequences', 'Partner-free line drills', 'Timer-based rounds'] },
+      { stage: 'Advanced', focus: 'Adaptive chaining, accuracy, and lawful intensity.', drills: ['Scenario rounds', 'Precision scoring', 'After-action pattern analysis'] }
+    ]
   }
 ];
