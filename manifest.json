@@ -1,9 +1,0 @@
-{
-  "short_name": "Imperium",
-  "name": "The Imperium",
-  "icons": [],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#0f766e",
-  "background_color": "#000000"
-}
