@@ -16,9 +16,9 @@ function Card({ title, children, action }) {
 
 export default function Dashboard() {
   const { state, content, readinessSummary } = useImperiumApp();
-  const steps = content.plannerTemplates[state.phase];
+  const steps = content.plannerTemplates[state.phase] || [];
   const todayLogs = state.plannerLogs[new Date().toISOString().slice(0, 10)] || [];
-  const progress = Math.round((todayLogs.length / steps.length) * 100);
+  const progress = steps.length > 0 ? Math.round((todayLogs.length / steps.length) * 100) : 0;
 
   return (
     <div className='space-y-4'>
@@ -26,11 +26,15 @@ export default function Dashboard() {
         title='Today spine'
         action={<Link className='text-sm text-teal-300' to='/planner'>Open planner</Link>}
       >
-        <p className='mb-3 text-sm text-stone-300'>The app should always answer what comes next, why it matters, how long it takes, and where to tap to begin.</p>
+        <p className='mb-3 text-sm text-stone-300'>
+          The app should always answer what comes next, why it matters, how long it takes, and where to tap to begin.
+        </p>
         <div className='mb-3 h-3 overflow-hidden rounded-full bg-neutral-800'>
           <div className='h-full rounded-full bg-teal-500' style={{ width: `${progress}%` }} />
         </div>
-        <p className='text-sm text-stone-400'>{todayLogs.length} of {steps.length} steps completed today.</p>
+        <p className='text-sm text-stone-400'>
+          {todayLogs.length} of {steps.length} steps completed today.
+        </p>
       </Card>
 
       <div className='grid gap-4 md:grid-cols-2'>
@@ -38,7 +42,9 @@ export default function Dashboard() {
           <p className='text-3xl font-bold text-stone-100'>{readinessSummary.ratio}%</p>
           <p className='mt-1 text-sm text-teal-200'>{readinessSummary.verdict}</p>
           <ul className='mt-3 list-disc space-y-1 pl-5 text-sm text-stone-300'>
-            {readinessSummary.blockedBy.slice(0, 3).map((item) => <li key={item}>{item}</li>)}
+            {readinessSummary.blockedBy.slice(0, 3).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </Card>
 
@@ -56,15 +62,25 @@ export default function Dashboard() {
 
       <div className='grid gap-4 md:grid-cols-3'>
         <Card title='Meals & grocery'>
-          <p className='text-sm text-stone-300'>Dual checklists are built in: one for store runs, one for online items.</p>
-          <p className='mt-3 text-sm text-stone-400'>Store list: {state.storeList.length} items · Online list: {state.onlineList.length} items</p>
+          <p className='text-sm text-stone-300'>
+            Dual checklists are built in: one for store runs, one for online items.
+          </p>
+          <p className='mt-3 text-sm text-stone-400'>
+            Store list: {state.storeList.length} items · Online list: {state.onlineList.length} items
+          </p>
         </Card>
+
         <Card title='Vel’nar tutor'>
-          <p className='text-sm text-stone-300'>Audio-first lesson structure, pronunciation notes, tests, and score tracking live here.</p>
+          <p className='text-sm text-stone-300'>
+            Audio-first lesson structure, pronunciation notes, tests, and score tracking live here.
+          </p>
           <Link className='mt-3 inline-block text-sm text-teal-300' to='/tutor'>Open tutor</Link>
         </Card>
+
         <Card title='Warrior path'>
-          <p className='text-sm text-stone-300'>Beginner-to-expert structure, defined terms, stance pages, and blade-practice logs are here.</p>
+          <p className='text-sm text-stone-300'>
+            Beginner-to-expert structure, defined terms, stance pages, and blade-practice logs are here.
+          </p>
           <Link className='mt-3 inline-block text-sm text-teal-300' to='/warrior'>Open warrior practice</Link>
         </Card>
       </div>
